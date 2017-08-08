@@ -1,0 +1,88 @@
+@import "room-share.css";
+
+#panels {
+    width: 90%;
+    height: 90%;
+}
+
+#list-panel {
+    float: left;
+    width: 25%;
+    height: 100%;
+}
+
+#chat-panel {
+    float: right;
+    width: 73%;
+    height: 100%;
+}
+
+.panel-body {
+    height: 90%;
+}
+
+#list-panel, #chat-panel {
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: 0.5s background-color;
+}
+
+#list-panel:hover, #chat-panel:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+#avatar-link {
+    display: inline-block;
+    float: right;
+    margin-top: -0.25em;
+    transition: 0.5s;
+}
+
+#avatar-link:hover {
+    transform: rotate(360deg);
+}
+
+#avatar {
+    width: 2em;
+}
+
+#dialog-area {
+    width: 100%;
+    height: 65%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#dialog-textarea {
+    width: 100%;
+    height: 65%;
+    resize: none;
+    overflow: auto;
+    font-size: 14px;
+    font-family: '宋体',serif;
+}
+
+#dialog-form{
+    height: 20%;
+}
+
+#dialog-submit-btn{
+    float: right;
+    margin-top: 0.5em;
+}
+
+#dialog-area,#dialog-textarea,#bar{
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+#bar{
+    margin-top: 0.5em;
+    margin-bottom: 0;
+    padding: 0 0.5em;
+    min-height: 0;
+    background-color: #337ab7;
+    border: none;
+}
+
+#bar .btn{
+    border: none;
+}

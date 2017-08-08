@@ -1,0 +1,22 @@
+{
+  "name": "webchatroom",
+  "version": "1.0.0",
+  "description": "A web chat room",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Soulike/WebChatRoom.git"
+  },
+  "author": "Soulike",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Soulike/WebChatRoom/issues"
+  },
+  "homepage": "https://github.com/Soulike/WebChatRoom#readme",
+  "dependencies": {
+    "koa": "^2.3.0"
+  }
+}

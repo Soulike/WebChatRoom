@@ -1,0 +1,26 @@
+html,body{
+    font-size: 20px;
+    font-family: "Noto Sans CJK SC Regular","微软雅黑",sans-serif;
+}
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.text-center{
+    text-align: center;
+}
+
+.label-block{
+    display: block;
+}
+
+button,input[type=submit]{
+    transition: 0.25s background-color;
+}
+
+.no-margin{
+    margin: 0;
+}

@@ -1,0 +1,8 @@
+@import "index-share.css";
+#form-area
+{
+    margin-top: -2.5em;
+}
+#password-again{
+    margin-bottom: 2.5em;
+}
