@@ -10,62 +10,199 @@
     <link rel="icon" href="../images/icon.png">
 </head>
 <body>
+<img src="../images/style.png" alt="style" role="button" class="img-circle rotate" id="style-btn" data-toggle="modal"
+     data-target="#modify-style-modal">
 <section class="container">
     <section id="panels" class="center">
         <div class="panel panel-primary" id="list-panel">
-            <div class="panel-heading"><span class="glyphicon glyphicon-cloud"></span> 当前在线
-                <a href="info.html" id="avatar-link"><img src="../images/头像.png" alt="avatar" class="img-circle"
-                                                          id="avatar"></a>
+            <div class="panel-heading table-display" id="list-panel-heading">
+                <div class="table-row-display">
+                    <div id="nickname-cell" class="table-cell-display middle dropdown">
+                        <span class="glyphicon glyphicon-cloud" id="status-icon"></span>
+                        <span role="button" data-toggle="dropdown" aria-haspopup="true"
+                              aria-expanded="true" id="switch-status-btn">
+                            <span id="nickname">°若灵™</span>
+                            <span class="caret"></span>
+                        </span>
+                        <ul class="dropdown-menu" aria-labelledby="switch-status-btn">
+                            <li><a href="#"><span class="glyphicon glyphicon-ok"></span> 在线</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-eye-open"></span> 窥屏</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-glass"></span> 离开</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-off"></span> 退出</a></li>
+                        </ul>
+                    </div>
+                    <span id="avatar-link" class="table-cell-display middle" role="button" data-toggle="modal"
+                          data-target="#modify-info-modal">
+                        <img src="../images/头像.png" alt="avatar" class="img-circle rotate" id="avatar">
+                    </span>
+                </div>
             </div>
             <div class="panel-body">
+                <div class="table-display" id="list-table">
+                    <div class="table-row-display online-person">
+                        <div class="table-cell-display list-avatar-div"><img src="../images/头像.png" alt="avatar"
+                                                                             class="list-avatar img-circle rotate">
+                        </div>
+                        <div class="table-cell-display list-nickname">°若灵™</div>
+                        <div class="table-cell-display list-status"><span class="glyphicon glyphicon-ok"></span></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="panel panel-primary" id="chat-panel">
             <div class="panel-heading text-center"><span class="glyphicon glyphicon-object-align-right"></span> 聊天室
             </div>
             <div class="panel-body">
-                <section id="dialog-area"></section>
-                <nav class="navbar navbar-default" id="bar">
-                    <div class=".container-fluid">
-                        <div class="btn-group dropdown">
-                            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                <span class="glyphicon glyphicon-font"> </span> <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="font-style" href="">宋体</a></li>
-                                <li><a class="font-style" href="">微软雅黑</a></li>
-                                <li><a class="font-style" href="">楷体</a></li>
-                                <li><a class="font-style" href="">仿宋</a></li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-primary btn-sm" id="bold-btn">
-                            <span class="glyphicon glyphicon-bold"></span>
-                        </button>
-                        <div class="btn-group dropdown">
-                            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                字号 <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="font-size" href="">14</a></li>
-                                <li><a class="font-size" href="">16</a></li>
-                                <li><a class="font-size" href="">18</a></li>
-                                <li><a class="font-size" href="">20</a></li>
-                                <li><a class="font-size" href="">22</a></li>
-                            </ul>
+                <div class="table-display" id="chat-panel-body-table">
+                    <div class="table-row-display" id="dialog-area-row">
+                        <div class="table-cell-display" id="dialog-area-cell">
+                            <div id="dialog-area">
+                                <div class="table-display" id="message-table">
+                                    <div class="table-row-display message-row">
+                                        <div class="table-cell-display message-avatar-div middle">
+                                            <img src="../images/头像.png" alt="avatar" class="message-avatar img-circle">
+                                        </div>
+                                        <div class="table-cell-display message-nickname middle">°若灵™</div>
+                                        <span class="table-cell-display middle colon">:</span>
+                                        <div class="table-cell-display message middle">
+                                            哈哈哈哈
+                                        </div>
+                                        <div class="table-cell-display message-time middle">17点07分</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </nav>
-                <form action="" id="dialog-form">
-                    <textarea name="dialog" id="dialog-textarea" placeholder="输入你想说的话吧~"
-                              class="form-control"></textarea>
-                    <input type="submit" value="发送" class="btn btn-primary" id="dialog-submit-btn">
-                </form>
+                    <div class="table-row-display" id="control-bar-row">
+                        <div class="table-cell-display">
+                            <div class="navbar navbar-default" id="control-bar">
+                                <div class=".container-fluid">
+                                    <div class="btn-group dropup">
+                                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                            <span class="glyphicon glyphicon-font"> </span> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="font-style" href="">宋体</a></li>
+                                            <li><a class="font-style" href="">微软雅黑</a></li>
+                                            <li><a class="font-style" href="">楷体</a></li>
+                                            <li><a class="font-style" href="">仿宋</a></li>
+                                        </ul>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" id="bold-btn">
+                                        <span class="glyphicon glyphicon-bold"></span>
+                                    </button>
+                                    <div class="btn-group dropup">
+                                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                            字号 <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="font-size" href="">14</a></li>
+                                            <li><a class="font-size" href="">16</a></li>
+                                            <li><a class="font-size" href="">18</a></li>
+                                            <li><a class="font-size" href="">20</a></li>
+                                            <li><a class="font-size" href="">22</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-row-display" id="dialog-textarea-row">
+                        <div class="table-cell-display" id="dialog-textarea-cell">
+                            <form action="" id="dialog-form">
+                    <textarea name="dialog" id="dialog-textarea" placeholder="输入你想说的话吧，最多50字哦~"
+                              class="form-control" autofocus></textarea>
+                                <span id="message-length-span" class="label label-primary"></span>
+                                <button type="submit" class="btn btn-primary" id="dialog-submit-btn" disabled>
+                                    <span class="glyphicon glyphicon-send"></span> 发送
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 </section>
+
+<!--Modify info modal-->
+<div class="modal fade" id="modify-info-modal" tabindex="-1" role="dialog" aria-labelledby="avatar-link">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-wrench"></span> 修改信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info modal-alert" role="alert">
+                    <span class="glyphicon glyphicon-info-sign"></span> 头像需为 JPEG、PNG 格式方形图片，否则将会被压缩变形。
+                </div>
+                <div>
+                    <div id="current-avatar-div"><img src="../images/头像.png" alt="avatar" id="current-avatar"></div>
+                    <div id="avatar-upload-control-div"><input type="file" id="avatar-upload-control"></div>
+                </div>
+                <div id="new-info-div">
+                    <input type="text" id="new-nickname" class="form-control" placeholder="昵称" minlength="1"
+                           maxlength="8">
+                    <input type="number" id="new-age" class="form-control" placeholder="年龄" min="0" max="120"
+                           maxlength="3">
+                    <select name="new_gender" id="new-gender" class="form-control">
+                        <option value="unknown">性别</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> 保存
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <span class="glyphicon glyphicon-remove"></span>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modify style modal-->
+<div class="modal fade" id="modify-style-modal" tabindex="-1" role="dialog" aria-labelledby="avatar-link">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-star"></span> 更改背景</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info modal-alert" role="alert"><span
+                        class="glyphicon glyphicon-info-sign"></span> 聊天室背景支持JPEG、PNG格式，请确保您上传的背景足够清晰、比例正确。
+                </div>
+                <form action="" id="background-upload-form">
+                    <input type="file" id="background-upload-control" accept="image/jpeg,image/png">
+                </form>
+                <div class="progress" id="background-upload-progress-bar-div">
+                    <div class="progress-bar progress-bar-striped active" id="background-upload-progress-bar"
+                         role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> 保存
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <span class="glyphicon glyphicon-remove"></span>关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="../lib/jquery-3.2.1.min.js"></script>
 <script src="../lib/bootstrap.min.js"></script>
 <script src="../scripts/lib.js"></script>

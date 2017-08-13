@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Soulike/WebChatRoom#readme",
   "dependencies": {
-    "koa": "^2.3.0"
+    "koa": "^2.3.0",
+    "koa-static": "^4.0.1"
   }
 }

@@ -1,4 +1,10 @@
 @import "room-share.css";
+#style-btn{
+    position: fixed;
+    top: 1%;
+    right: 1%;
+    width: 2.5%;
+}
 
 #panels {
     width: 90%;
@@ -19,6 +25,7 @@
 
 .panel-body {
     height: 90%;
+    overflow: auto;
 }
 
 #list-panel, #chat-panel {
@@ -30,52 +37,129 @@
     background-color: rgba(255, 255, 255, 0.8);
 }
 
-#avatar-link {
-    display: inline-block;
-    float: right;
-    margin-top: -0.25em;
-    transition: 0.5s;
+#list-panel-heading {
+    width: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 49px;
 }
 
-#avatar-link:hover {
-    transform: rotate(360deg);
+#avatar-link {
+    width: 2em;
+    height: 2em;
 }
 
 #avatar {
     width: 2em;
+    height: 2em;
+    vertical-align: middle;
+}
+
+.list-avatar-div{
+    width: 15%;
+}
+
+.list-avatar{
+    width: 2em;
+    height: 2em;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.list-nickname{
+    width: 80%;
+    cursor: default;
+}
+
+#list-table{
+    width: 100%;
+    font-size: 0.5em;
+    border-spacing: 0 0.5em;
+}
+
+#chat-panel-body-table {
+    width: 100%;
+    height: 100%;
+}
+
+#dialog-area-row {
+    width: 100%;
+    height: 50%;
+}
+
+#dialog-area-cell {
+    padding-bottom: 2.5%;
 }
 
 #dialog-area {
-    width: 100%;
-    height: 65%;
+    height: 100%;
     border: 1px solid #ccc;
     border-radius: 4px;
+    overflow: auto;
 }
 
 #dialog-textarea {
     width: 100%;
-    height: 65%;
+    height: 70%;
     resize: none;
     overflow: auto;
     font-size: 14px;
-    font-family: '宋体',serif;
+    font-family: '宋体', serif;
+
 }
 
-#dialog-form{
+#dialog-textarea-row {
     height: 20%;
 }
 
-#dialog-submit-btn{
+#dialog-submit-btn {
     float: right;
-    margin-top: 0.5em;
+    margin-top: 1%;
 }
 
-#dialog-area,#dialog-textarea,#bar{
+#dialog-area, #dialog-textarea, #control-bar {
     background-color: rgba(255, 255, 255, 0.75);
 }
 
-#bar{
-    margin-top: 0.5em;
+#message-table{
+    font-size: 0.75em;
+    border-spacing: 1em 1em;
+    width: 100%;
+}
+
+.message-avatar-div{
+    width: 5%;
+}
+
+.message-avatar{
+    width: 2em;
+    height: 2em;
+}
+
+.message-nickname{
+    width: 10%;
+    text-align: center;
+}
+
+.colon{
+    width: 0.5%;
+}
+
+.message{
+    text-align: justify;
+}
+
+.message-time{
+    width: 5em;
+    font-size: x-small;
+    color: gray;
+}
+
+#control-bar-row {
+    height: 5%;
+}
+
+#control-bar {
     margin-bottom: 0;
     padding: 0 0.5em;
     min-height: 0;
@@ -83,6 +167,75 @@
     border: none;
 }
 
-#bar .btn{
+#control-bar .btn {
     border: none;
+}
+
+.modify_alert{
+    z-index: 999;
+}
+
+#background-upload-control{
+    margin-left:auto;
+    margin-right:auto;
+    font-size: 0.75em;
+    border: solid 1px gray;
+    border-radius: 0.25em;
+    box-shadow: gray 0 0 2px;
+    padding: 0.5em 1em;
+}
+
+#background-upload-progress-bar-div{
+    margin-top: 1em;
+}
+
+#current-avatar-div{
+    display: inline-block;
+    width: 40%;
+    text-align: center;
+}
+
+#current-avatar{
+    width: 4em;
+    height: 4em;
+}
+
+#avatar-upload-control-div{
+    display: inline-block;
+}
+
+#avatar-upload-control{
+    font-size: 0.75em;
+}
+
+.modify-info-modal-alert{
+    width: 100%;
+}
+
+#new-info-div{
+    margin-top: 1em;
+    text-align: center;
+}
+
+#new-nickname{
+    display: inline-block;
+    width: 50%;
+    margin-right: 10%
+}
+
+#new-age{
+    display: inline-block;
+    width: 15%;
+}
+
+#new-gender{
+    display: inline-block;
+    width: 15%;
+}
+
+#message-length-span{
+    display: inline-block;
+    font-size: 0.75em;
+    margin-top: 0.5em;
+    transition: 0.25s background-color;
 }

@@ -1,4 +1,4 @@
-html,body{
+body{
     font-size: 20px;
     font-family: "Noto Sans CJK SC Regular","微软雅黑",sans-serif;
 }
@@ -23,4 +23,37 @@ button,input[type=submit]{
 
 .no-margin{
     margin: 0;
+}
+
+.table-display{
+    display: table;
+}
+
+.table-row-display{
+    display: table-row;
+}
+
+.table-cell-display {
+    display: table-cell;
+}
+
+.middle{
+    vertical-align: middle;
+}
+
+.modal-title{
+    text-align: center;
+    font-size: larger;
+}
+
+.modal-alert{
+    font-size: 0.75em;
+}
+
+.rotate{
+    transition: 0.5s transform;
+}
+
+.rotate:hover{
+    transform: rotate(360deg);
 }

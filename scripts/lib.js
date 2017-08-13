@@ -9,7 +9,7 @@ function AJAX(action, data, success_function, error_function, async = true)
 			timeout: 2000,
 			async: async,
 			dataType: 'json',
-			url: `http://127.0.0.1:3000/action=${action}`,
+			url: `http://127.0.0.1:3000/${action}`,
 			method: 'post',
 			data: JSON.stringify(data),
 			success: success_function,
