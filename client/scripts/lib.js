@@ -8,7 +8,7 @@ const STATUS_ICONS = {
 	WATCHING: 'glyphicon-eye-open',
 	LEAVE: 'glyphicon-glass',
 };
-const [DOMAIN, PORT] = ['192.168.137.1', 80];
+const [DOMAIN, PORT] = ['127.0.0.1', 80];
 
 class Register_info
 {
@@ -40,13 +40,12 @@ class User_info
 
 class Message
 {
-	constructor(font,bold,font_size,content,send_time)
+	constructor(font,bold,font_size,content)
 	{
 		this.font = font;
 		this.bold = bold;
 		this.font_size = font_size;
 		this.content = content;
-		this.send_time = send_time;
 	}
 }
 

@@ -447,6 +447,24 @@ $(function ()
 	{
 		list_change_avatar(data);
 	});
+
+	socket.on('new_message',function (data)
+	{
+		dialog_add_row(data);
+	})
+});
+
+/**Send Message**/
+$(function ()
+{
+	const $dialog_submit_button = $('#dialog-submit-btn');
+	const $dialog_textarea = $('#dialog-textarea');
+	$dialog_submit_button.click(function (event)
+	{
+		event.preventDefault();
+		const message = new Message($dialog_textarea.css('fontFamily'),$dialog_textarea.css('fontWeight'),$dialog_textarea.css('fontSize'),$dialog_textarea.val());
+		io.emit('message',message);
+	});
 });
 
 function show_error_modal()
@@ -550,6 +568,48 @@ function list_modify_info(info_obj)
 <span class="glyphicon glyphicon-heart"></span> 昵称：${nickname}<br/>
 <span class="glyphicon glyphicon-globe"></span> 年龄：${age}<br/>
 <span class="glyphicon glyphicon-leaf"></span> 性别：${gender ? '男' : '女'}`)
+}
+
+/**
+ * <div class="table-row-display message-row">
+ <div class="table-cell-display message-avatar-div middle">
+ <img src="images/avatars/avatar.png" alt="avatar" class="message-avatar img-circle">
+ </div>
+ <div class="table-cell-display message-nickname middle">°若灵™</div>
+ <span class="table-cell-display middle colon">:</span>
+ <div class="table-cell-display message middle">
+ 哈哈哈哈
+ </div>
+ <div class="table-cell-display message-time middle">17点07分</div>
+ </div>
+ * **/
+function dialog_add_row(message_obj)
+{
+	const $message_table = $('#message-table');
+	const {account, nickname, font, bold, font_size, content, send_time} = message_obj;
+	const style = `font-family:${font};font-weight:${bold};font-size:${font_size}`;
+	let file_type = '';
+	let has_avatar = false;
+	for (const file_t of ALLOW_FILE_TYPES)
+		if (is_existent(`images/avatars/${account}.${file_t}`))
+		{
+			file_type = file_t;
+			has_avatar = true;
+			break;
+		}
+	const img_src = has_avatar ? `images/avatars/${account}.${file_type}` : `images/avatars/avatar.png`;
+	$message_table.append(
+		`<div class="table-row-display message-row">
+ <div class="table-cell-display message-avatar-div middle">
+ <img src=${img_src} alt="avatar" class="message-avatar img-circle">
+ </div>
+ <div class="table-cell-display message-nickname middle">${nickname}</div>
+ <span class="table-cell-display middle colon">:</span>
+ <div class="table-cell-display message middle" style=${style}>${content}</div>
+ <div class="table-cell-display message-time middle">${send_time}</div>
+ </div>`
+	);
+	$message_table.animate({scrollTop:$message_table.height},250);
 }
 
 /**Online/Offline switch**/

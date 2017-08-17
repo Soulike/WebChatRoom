@@ -2,7 +2,7 @@ exports.PORT = 80;
 
 exports.DATABASE_CONFIG = {
 	user: 'postgres',
-	host: 'localhost',
+	host: '127.0.0.1',
 	database: 'Web-Chat-Room',
 	password: 'SoulikeZhou',
 	port: 5432,
@@ -19,6 +19,22 @@ class response
 }
 
 exports.RESPONSE = response;
+
+class message
+{
+	constructor(account,nickname,font,bold,font_size,content,send_time)
+	{
+		this.account = account;
+		this.nickname = nickname;
+		this.font = font;
+		this.bold = bold;
+		this.font_size = font_size;
+		this.content = content;
+		this.send_time = send_time;
+	}
+}
+
+exports.MESSAGE = message;
 
 exports.STATUS = {
 	OFFLINE:0,

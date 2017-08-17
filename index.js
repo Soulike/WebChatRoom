@@ -251,7 +251,7 @@ app.use(route.post('/modify_info', async function (ctx, next)
 			else
 			{
 				await FUNCTION.update_query(pool, {nickname: nickname, age: age, gender: gender}, {account: account});
-				ctx.body = new CONFIG.RESPONSE(true, '信息更改成功', {account:account});
+				ctx.body = new CONFIG.RESPONSE(true, '信息更改成功', {account: account});
 				FUNCTION.socket_send(io, 'modify_info', {
 					account: account,
 					nickname: nickname,
@@ -309,7 +309,21 @@ app.use(async function (ctx, next)
 {
 	try
 	{
+		io.on('message', async function (ctx, data)
+		{
+			const {account} = FUNCTION.COOKIE.parse(ctx.client.request.headers.cookie);
+			const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
+			const {nickname} = res.rows[0];
 
+			const {font, bold, font_size, content} = ctx.data;
+
+			const date = new Date();
+			const send_time = `${date.getHours()}时${date.getMinutes()}分`;
+
+			const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
+
+			FUNCTION.socket_send(io, 'new_message', message);
+		});
 	} catch (error)
 	{
 		FUNCTION.log(`Socket发生错误，错误信息：\n${error.stack}`);
