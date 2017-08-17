@@ -157,21 +157,19 @@ app.use(route.post('/switch_status', async function (ctx, next)
 			else
 			{
 				await FUNCTION.update_query(pool, {status: status}, {account: account});
-				ctx.body = new CONFIG.RESPONSE(true);
 				if (parseInt(status) === CONFIG.STATUS.OFFLINE || parseInt(status) === CONFIG.STATUS.WATCHING)
 				{
-					if (parseInt(status) === 0)//real offline
+					if (parseInt(status) === CONFIG.STATUS.OFFLINE)//real offline
 						FUNCTION.log(`账号${account}下线`);
 					FUNCTION.socket_send(io, 'change_status', {account: account,status:CONFIG.STATUS.OFFLINE});
 				}
-				else if(parseInt(status) === CONFIG.STATUS.ONLINE)//online
+				else//online or leave
 				{
 					const res = await FUNCTION.select_query(pool,
 						['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {account: account,status:status});
 					FUNCTION.socket_send(io, 'change_status', res.rows[0]);
 				}
-				else//leave
-					FUNCTION.socket_send(io, 'change_status', {account: account, status: status});
+				ctx.body = new CONFIG.RESPONSE(true);
 			}
 		}
 	} catch (error)

@@ -522,8 +522,6 @@ function list_add_row(info_obj)
 <span class="glyphicon glyphicon-leaf"></span> 性别：${gender ? '男' : '女'}`,
 			`<span class="glyphicon glyphicon-info-sign"></span>  用户信息`, 'right', true);
 	}
-	else
-		change_status(info_obj);
 }
 
 //{account}
@@ -559,16 +557,17 @@ function list_change_avatar(info_obj)
 function change_status(info_obj)
 {
 	const {account, status} = info_obj;
-	if (status === OFFLINE)
-		list_remove_row(info_obj);
-	else if (status === ONLINE)
-		list_add_row(info_obj);
-	else
+	if (parseInt(status) === OFFLINE)
 	{
-		const status_icon_span = $(`#${account}_status`);
-		status_icon_span.removeAttr('class');
-		status_icon_span.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
+		list_remove_row(info_obj);
+		return;
 	}
+	else if (parseInt(status) === ONLINE || parseInt(status) === LEAVE)
+		list_add_row(info_obj);
+
+	const status_icon_span = $(`#${account}_status`);
+	status_icon_span.removeAttr('class');
+	status_icon_span.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[parseInt(status)]);
 }
 
 //{account, nickname, age, gender}
