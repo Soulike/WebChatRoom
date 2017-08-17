@@ -219,34 +219,37 @@ $(function ()
 $(function ()
 {
 	const $status = $('.status');
-	const $status_icon = $('#status-icon');
 	$status.click(function (event)
 	{
 		let status = $(event.target).attr('id');
-		if (parseInt(status) === 0)
-			location.href = 'index.html';
-		else
-		{
-			AJAX('switch_status', {status: status},
-				function (response)
-				{
-					const {code, message, data} = response;
-					if (code === false)
-						show_error_modal();
-					else
-					{
-						$status_icon.removeAttr('class');
-						$status_icon.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
-					}
-				},
-				function (error)
-				{
-					console.log(error.stack);
-					show_tip('状态切换失败', 'error');
-				});
-		}
+		switch_status_to(status);
 	})
 });
+
+function switch_status_to(status)
+{
+	const $status_icon = $('#status-icon');
+	AJAX('switch_status', {status: status},
+		function (response)
+		{
+			const {code, message, data} = response;
+			if (parseInt(status) === 0)
+				location.href = 'index.html';
+
+			if (code === false)
+				show_error_modal();
+			else
+			{
+				$status_icon.removeAttr('class');
+				$status_icon.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
+			}
+		},
+		function (error)
+		{
+			console.log(error.stack);
+			show_tip('状态切换失败', 'error');
+		});
+}
 
 /**Upload avatar preview**/
 $(function ()
@@ -417,16 +420,6 @@ $(function ()
 /**Socket**/
 $(function ()
 {
-	socket.on('user_online', function (data)
-	{
-		list_add_row(data);
-	});
-
-	socket.on('user_offline', function (data)
-	{
-		list_remove_row(data);
-	});
-
 	socket.on('change_status', function (data)
 	{
 		change_status(data);
@@ -566,9 +559,16 @@ function list_change_avatar(info_obj)
 function change_status(info_obj)
 {
 	const {account, status} = info_obj;
-	const status_icon_span = $(`#${account}_status`);
-	status_icon_span.removeAttr('class');
-	status_icon_span.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
+	if (status === OFFLINE)
+		list_remove_row(info_obj);
+	else if (status === ONLINE)
+		list_add_row(info_obj);
+	else
+	{
+		const status_icon_span = $(`#${account}_status`);
+		status_icon_span.removeAttr('class');
+		status_icon_span.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
+	}
 }
 
 //{account, nickname, age, gender}
@@ -632,27 +632,11 @@ function dialog_add_row(message_obj)
 /**Online/Offline switch**/
 window.onunload = function ()
 {
-	AJAX('switch_status', {status: OFFLINE},
-		function (response)
-		{
-
-		},
-		function (error)
-		{
-
-		}, false);
+	switch_status_to(OFFLINE);
 	socket.close();
 };
 
 $(function ()
 {
-	AJAX('switch_status', {status: ONLINE},
-		function (response)
-		{
-
-		},
-		function (error)
-		{
-
-		});
+	switch_status_to(ONLINE);
 });
