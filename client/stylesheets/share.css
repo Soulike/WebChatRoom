@@ -1,7 +1,10 @@
-body{
+body {
     font-size: 20px;
-    font-family: "Noto Sans CJK SC Regular","微软雅黑",sans-serif;
+    font-family: "Noto Sans CJK SC Regular", "微软雅黑", sans-serif;
+    display: none;
+    background-size: cover;
 }
+
 .center {
     position: absolute;
     top: 50%;
@@ -9,27 +12,27 @@ body{
     transform: translate(-50%, -50%);
 }
 
-.text-center{
+.text-center {
     text-align: center;
 }
 
-.label-block{
+.label-block {
     display: block;
 }
 
-button,input[type=submit]{
+button, input[type=submit] {
     transition: 0.25s background-color;
 }
 
-.no-margin{
+.no-margin {
     margin: 0;
 }
 
-.table-display{
+.table-display {
     display: table;
 }
 
-.table-row-display{
+.table-row-display {
     display: table-row;
 }
 
@@ -37,23 +40,38 @@ button,input[type=submit]{
     display: table-cell;
 }
 
-.middle{
+.middle {
     vertical-align: middle;
 }
 
-.modal-title{
+.modal-title {
     text-align: center;
     font-size: larger;
 }
 
-.modal-alert{
+.modal-alert {
     font-size: 0.75em;
 }
 
-.rotate{
+.rotate {
     transition: 0.5s transform;
 }
 
-.rotate:hover{
+.rotate:hover {
     transform: rotate(360deg);
+}
+
+.modify_alert {
+    z-index: 1051;
+    box-shadow: gray 2px 2px 4px;
+}
+
+.popover-title {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}
+
+.popover {
+    border-color: #337ab7;
 }

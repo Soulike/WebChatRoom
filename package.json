@@ -17,7 +17,14 @@
   },
   "homepage": "https://github.com/Soulike/WebChatRoom#readme",
   "dependencies": {
+    "blueimp-md5": "^2.8.0",
     "koa": "^2.3.0",
-    "koa-static": "^4.0.1"
+    "koa-body": "^2.3.0",
+    "koa-helmet": "^3.2.0",
+    "koa-route": "^3.2.0",
+    "koa-socket": "^4.4.0",
+    "koa-static": "^4.0.1",
+    "pg": "^7.1.2",
+    "socket.io": "^2.0.3"
   }
 }

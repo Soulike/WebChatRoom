@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>聊天室 - Skyline</title>
-    <link rel="stylesheet" href="../lib/bootstrap.min.css">
-    <link rel="stylesheet" href="../stylesheets/share.css">
-    <link rel="stylesheet" href="../stylesheets/room.css">
-    <link rel="icon" href="../images/icon.png">
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/share.css">
+    <link rel="stylesheet" href="stylesheets/room.css">
+    <link rel="icon" href="images/icon.png">
 </head>
 <body>
-<img src="../images/style.png" alt="style" role="button" class="img-circle rotate" id="style-btn" data-toggle="modal"
+<img src="images/style.png" alt="style" role="button" class="img-circle rotate" id="style-btn" data-toggle="modal"
      data-target="#modify-style-modal">
 <section class="container">
     <section id="panels" class="center">
@@ -18,36 +18,44 @@
             <div class="panel-heading table-display" id="list-panel-heading">
                 <div class="table-row-display">
                     <div id="nickname-cell" class="table-cell-display middle dropdown">
-                        <span class="glyphicon glyphicon-cloud" id="status-icon"></span>
+                        <span class="glyphicon glyphicon-ok" id="status-icon"></span>
                         <span role="button" data-toggle="dropdown" aria-haspopup="true"
                               aria-expanded="true" id="switch-status-btn">
                             <span id="nickname">°若灵™</span>
                             <span class="caret"></span>
                         </span>
                         <ul class="dropdown-menu" aria-labelledby="switch-status-btn">
-                            <li><a href="#"><span class="glyphicon glyphicon-ok"></span> 在线</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-eye-open"></span> 窥屏</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-glass"></span> 离开</a></li>
+                            <li>
+                                <a role=button class="status" id="1">
+                                    <span class="glyphicon glyphicon-ok"></span> 在线
+                                </a>
+                            </li>
+                            <li>
+                                <a role=button class="status" id="2">
+                                    <span class="glyphicon glyphicon-eye-open"></span> 窥屏
+                                </a>
+                            </li>
+                            <li>
+                                <a role=button class="status" id="3">
+                                    <span class="glyphicon glyphicon-glass"></span> 离开
+                                </a>
+                            </li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-off"></span> 退出</a></li>
+                            <li>
+                                <a role=button class="status" id="0">
+                                    <span class="glyphicon glyphicon-off"></span> 退出
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <span id="avatar-link" class="table-cell-display middle" role="button" data-toggle="modal"
                           data-target="#modify-info-modal">
-                        <img src="../images/头像.png" alt="avatar" class="img-circle rotate" id="avatar">
+                        <img src="images/avatars/avatar.png" alt="avatar" class="img-circle rotate" id="avatar">
                     </span>
                 </div>
             </div>
             <div class="panel-body">
-                <div class="table-display" id="list-table">
-                    <div class="table-row-display online-person">
-                        <div class="table-cell-display list-avatar-div"><img src="../images/头像.png" alt="avatar"
-                                                                             class="list-avatar img-circle rotate">
-                        </div>
-                        <div class="table-cell-display list-nickname">°若灵™</div>
-                        <div class="table-cell-display list-status"><span class="glyphicon glyphicon-ok"></span></div>
-                    </div>
-                </div>
+                <div class="table-display" id="list-table"><!--User rows here--></div>
             </div>
         </div>
         <div class="panel panel-primary" id="chat-panel">
@@ -61,7 +69,7 @@
                                 <div class="table-display" id="message-table">
                                     <div class="table-row-display message-row">
                                         <div class="table-cell-display message-avatar-div middle">
-                                            <img src="../images/头像.png" alt="avatar" class="message-avatar img-circle">
+                                            <img src="images/avatars/avatar.png" alt="avatar" class="message-avatar img-circle">
                                         </div>
                                         <div class="table-cell-display message-nickname middle">°若灵™</div>
                                         <span class="table-cell-display middle colon">:</span>
@@ -144,7 +152,7 @@
                     <span class="glyphicon glyphicon-info-sign"></span> 头像需为 JPEG、PNG 格式方形图片，否则将会被压缩变形。
                 </div>
                 <div>
-                    <div id="current-avatar-div"><img src="../images/头像.png" alt="avatar" id="current-avatar"></div>
+                    <div id="current-avatar-div"><img src="images/avatars/avatar.png" alt="avatar" id="current-avatar"></div>
                     <div id="avatar-upload-control-div"><input type="file" id="avatar-upload-control"></div>
                 </div>
                 <div id="new-info-div">
@@ -153,14 +161,13 @@
                     <input type="number" id="new-age" class="form-control" placeholder="年龄" min="0" max="120"
                            maxlength="3">
                     <select name="new_gender" id="new-gender" class="form-control">
-                        <option value="unknown">性别</option>
                         <option value="male">男</option>
                         <option value="female">女</option>
                     </select>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> 保存
+                <button type="button" class="btn btn-primary" id="modify-info-modal-button"><span class="glyphicon glyphicon-floppy-disk"></span> 保存
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
                     <span class="glyphicon glyphicon-remove"></span>关闭
@@ -193,7 +200,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> 保存
+                <button type="button" class="btn btn-primary" id="modify-style-modal-button">
+                    <span class="glyphicon glyphicon-floppy-disk"></span> 保存
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
                     <span class="glyphicon glyphicon-remove"></span>关闭
@@ -203,9 +211,33 @@
     </div>
 </div>
 
-<script src="../lib/jquery-3.2.1.min.js"></script>
-<script src="../lib/bootstrap.min.js"></script>
-<script src="../scripts/lib.js"></script>
-<script src="../scripts/room.js"></script>
+<!--Offline modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="offline-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">错误</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger modal-alert" role="alert">
+                    <span class="glyphicon glyphicon-remove-sign"></span> 登录状态错误，请重新登录
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">
+                    <span class="glyphicon glyphicon-ok-sign"></span> 确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="lib/jquery-3.2.1.min.js"></script>
+<script src="lib/bootstrap.min.js"></script>
+<script src="lib/socket.io.js"></script>
+<script src="scripts/lib.js"></script>
+<script src="scripts/room.js"></script>
 </body>
 </html>
