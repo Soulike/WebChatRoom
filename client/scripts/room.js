@@ -180,24 +180,23 @@ $(function ()
 /**If the text area is empty, prevent submitting**/
 $(function ()
 {
-	const max_length = 50;
 	const $dialog_textarea = $('#dialog-textarea');
-	const $dialog_submit_btn = $('#dialog-submit-btn');
+	const $dialog_submit_button = $('#dialog-submit-button');
 	const $message_length_span = $('#message-length-span');
 
-	$message_length_span.text(`0/${max_length}`);
-	$dialog_textarea.attr('maxlength', max_length);
+	$message_length_span.text(`0/${MESSAGE_MAX_LENGTH}`);
+	$dialog_textarea.attr('maxlength', MESSAGE_MAX_LENGTH);
 
 	$dialog_textarea.bind('input propertyChange', function ()
 	{
 		if (!$dialog_textarea.val())
-			$dialog_submit_btn.attr('disabled', 'disabled');
+			$dialog_submit_button.attr('disabled', 'disabled');
 		else
-			$dialog_submit_btn.removeAttr('disabled');
+			$dialog_submit_button.removeAttr('disabled');
 
-		$message_length_span.text(`${$dialog_textarea.val().length}/${max_length}`);
+		$message_length_span.text(`${$dialog_textarea.val().length}/${MESSAGE_MAX_LENGTH}`);
 
-		if ($dialog_textarea.val().length >= max_length)
+		if ($dialog_textarea.val().length >= MESSAGE_MAX_LENGTH)
 			$message_length_span.removeClass('label-primary').addClass('label-danger');
 		else
 			$message_length_span.removeClass('label-danger').addClass('label-primary');
@@ -448,7 +447,7 @@ $(function ()
 		list_change_avatar(data);
 	});
 
-	socket.on('new_message',function (data)
+	socket.on('new_message', function (data)
 	{
 		dialog_add_row(data);
 	})
@@ -457,14 +456,32 @@ $(function ()
 /**Send Message**/
 $(function ()
 {
-	const $dialog_submit_button = $('#dialog-submit-btn');
+	const $dialog_submit_button = $('#dialog-submit-button');
 	const $dialog_textarea = $('#dialog-textarea');
+	const $message_length_span = $('#message-length-span');
 	$dialog_submit_button.click(function (event)
 	{
 		event.preventDefault();
-		const message = new Message($dialog_textarea.css('fontFamily'),$dialog_textarea.css('fontWeight'),$dialog_textarea.css('fontSize'),$dialog_textarea.val());
-		io.emit('message',message);
+		send_message();
 	});
+
+	$dialog_textarea.keydown(function (event)
+	{
+		if (event.which === 13)
+		{
+			event.preventDefault();
+			send_message();
+		}
+	});
+
+	function send_message()
+	{
+		const message = new Message($dialog_textarea.css('fontFamily'), $dialog_textarea.css('fontWeight'), $dialog_textarea.css('fontSize'), $dialog_textarea.val());
+		socket.emit('message', message);
+		$dialog_textarea.val('');
+		$message_length_span.text(`0/${MESSAGE_MAX_LENGTH}`);
+		$dialog_submit_button.attr('disabled', 'disabled');
+	}
 });
 
 function show_error_modal()
@@ -512,6 +529,8 @@ function list_add_row(info_obj)
 <span class="glyphicon glyphicon-leaf"></span> 性别：${gender ? '男' : '女'}`,
 			`<span class="glyphicon glyphicon-info-sign"></span>  用户信息`, 'right', true);
 	}
+	else
+		change_status(info_obj);
 }
 
 //{account}
@@ -529,8 +548,6 @@ function list_change_avatar(info_obj)
 {
 	let file_type = '';
 	const {account} = info_obj;
-	if (!$(`#${account}`).length)
-		get_list();
 	for (const file_t of ALLOW_FILE_TYPES)
 		if (is_existent(`images/avatars/${account}.${file_t}`))
 		{
@@ -549,8 +566,6 @@ function list_change_avatar(info_obj)
 function change_status(info_obj)
 {
 	const {account, status} = info_obj;
-	if (!$(`#${account}`).length)
-		get_list();
 	const status_icon_span = $(`#${account}_status`);
 	status_icon_span.removeAttr('class');
 	status_icon_span.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
@@ -586,6 +601,7 @@ function list_modify_info(info_obj)
 function dialog_add_row(message_obj)
 {
 	const $message_table = $('#message-table');
+	const $dialog_area = $('#dialog-area');
 	const {account, nickname, font, bold, font_size, content, send_time} = message_obj;
 	const style = `font-family:${font};font-weight:${bold};font-size:${font_size}`;
 	let file_type = '';
@@ -605,12 +621,13 @@ function dialog_add_row(message_obj)
  </div>
  <div class="table-cell-display message-nickname middle">${nickname}</div>
  <span class="table-cell-display middle colon">:</span>
- <div class="table-cell-display message middle" style=${style}>${content}</div>
+ <div class="table-cell-display message middle" style="${style}">${content}</div>
  <div class="table-cell-display message-time middle">${send_time}</div>
  </div>`
 	);
-	$message_table.animate({scrollTop:$message_table.height},250);
+	$dialog_area.animate({scrollTop: $message_table.height()}, 500);
 }
+
 
 /**Online/Offline switch**/
 window.onunload = function ()

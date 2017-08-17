@@ -99,7 +99,6 @@ app.use(route.post('/login', async function (ctx, next)
 					const res = await FUNCTION.select_query(pool,
 						['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {account: account});
 					FUNCTION.socket_send(io, 'user_online', res.rows[0]);
-
 					FUNCTION.log(`账号${account}登陆成功`);
 				}
 				else
@@ -157,14 +156,24 @@ app.use(route.post('/switch_status', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false, '参数错误');
 			else
 			{
-				await FUNCTION.update_query(pool, {status: status}, {account: account}).log;
-				FUNCTION.socket_send(io, 'change_status', {account: account, status: status});
+				await FUNCTION.update_query(pool, {status: status}, {account: account});
 				ctx.body = new CONFIG.RESPONSE(true);
-				if (parseInt(status) === 0)
+				if (parseInt(status) === 0 || parseInt(status) === 2)
 				{
-					FUNCTION.log(`账号${account}下线`);
-					FUNCTION.socket_send(io, 'user_offline', {account: account});
+					if (parseInt(status) === 0)
+					{
+						FUNCTION.log(`账号${account}下线`);
+						FUNCTION.socket_send(io, 'user_offline', {account: account});
+					}
 				}
+				else if(parseInt(status) === 1)
+				{
+					const res = await FUNCTION.select_query(pool,
+						['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {account: account});
+					FUNCTION.socket_send(io, 'user_online', res.rows[0]);
+				}
+				else
+					FUNCTION.socket_send(io, 'change_status', {account: account, status: status});
 			}
 		}
 	} catch (error)
@@ -305,30 +314,21 @@ app.use(route.post('/get_list', async function (ctx, next)
 }));
 
 /**Socket**/
-app.use(async function (ctx, next)
+io.on('message', async function (ctx, data)
 {
-	try
-	{
-		io.on('message', async function (ctx, data)
-		{
-			const {account} = FUNCTION.COOKIE.parse(ctx.client.request.headers.cookie);
-			const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
-			const {nickname} = res.rows[0];
+	const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
+	const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
+	const {nickname} = res.rows[0];
 
-			const {font, bold, font_size, content} = ctx.data;
+	const {font, bold, font_size, content} = ctx.data;
 
-			const date = new Date();
-			const send_time = `${date.getHours()}时${date.getMinutes()}分`;
+	const date = new Date();
+	const send_time = `${date.getHours()}时${date.getMinutes()}分`;
 
-			const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
+	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
 
-			FUNCTION.socket_send(io, 'new_message', message);
-		});
-	} catch (error)
-	{
-		FUNCTION.log(`Socket发生错误，错误信息：\n${error.stack}`);
-	}
-	await next();
+	FUNCTION.socket_send(io, 'new_message', message);
 });
+
 
 app.listen(CONFIG.PORT);

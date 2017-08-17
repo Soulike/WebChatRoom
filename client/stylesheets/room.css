@@ -95,7 +95,6 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     overflow: auto;
-
 }
 
 #dialog-textarea {
@@ -112,7 +111,7 @@
     height: 20%;
 }
 
-#dialog-submit-btn {
+#dialog-submit-button {
     float: right;
     margin-top: 1%;
 }

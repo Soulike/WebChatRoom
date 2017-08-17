@@ -10,6 +10,8 @@ const STATUS_ICONS = {
 };
 const [DOMAIN, PORT] = ['127.0.0.1', 80];
 
+const MESSAGE_MAX_LENGTH = 50;
+
 class Register_info
 {
 	constructor(nickname, password)
