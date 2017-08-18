@@ -2,7 +2,7 @@ exports.PORT = 80;
 
 exports.DATABASE_CONFIG = {
 	user: 'postgres',
-	host: '127.0.0.1',
+	host: '47.94.152.219',
 	database: 'Web-Chat-Room',
 	password: 'SoulikeZhou',
 	port: 5432,
