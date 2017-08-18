@@ -443,7 +443,12 @@ $(function ()
 	socket.on('new_message', function (data)
 	{
 		dialog_add_row(data);
-	})
+	});
+
+	socket.on('is_online',function (data)
+	{
+		socket.emit('online',{});
+	});
 });
 
 /**Send Message**/

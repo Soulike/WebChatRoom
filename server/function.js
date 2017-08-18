@@ -189,7 +189,7 @@ exports.COOKIE.parse = function (cookie_string)
 	return result;
 };
 
-exports.set_status = async function (user_status_obj, account, status, pool,io)
+exports.set_status = async function (user_status_obj, account, status, pool, io)
 {
 	if (parseInt(status) === CONFIG.STATUS.OFFLINE)
 	{
@@ -197,7 +197,7 @@ exports.set_status = async function (user_status_obj, account, status, pool,io)
 		exports.log(`账号${account}下线`);
 	}
 	else
-		user_status_obj[account] = parseInt(status);
+		user_status_obj[account] = {status: parseInt(status), last_respond: Date.now()};
 
 	let data = {};
 	if (parseInt(status) === CONFIG.STATUS.ONLINE || parseInt(status) === CONFIG.STATUS.LEAVE)
@@ -216,14 +216,29 @@ exports.set_status = async function (user_status_obj, account, status, pool,io)
 };
 
 exports.OBJECT = {};
-exports.OBJECT.find_key_by_value = function (obj, value)
+exports.OBJECT.find_status = function (obj, status)
 {
 	const keys = Object.keys(obj);
 	let ret = [];
-	for(const key of keys)
+	for (const key of keys)
 	{
-		if(obj[key] === value)
+		if (obj[key].status === status)
 			ret.push(key);
 	}
 	return ret;
+};
+
+exports.check_online = function (user_status_obj, io)
+{
+	const now = Date.now();
+	const keys = Object.keys(user_status_obj);
+	for (const account of keys)
+	{
+		if (user_status_obj[account].last_respond - now > 3000000)
+		{
+			delete user_status_obj[account];
+			exports.log(`账号${account}下线`);
+			exports.socket_send(io, 'change_status', {account:account,status:CONFIG.STATUS.OFFLINE});
+		}
+	}
 };

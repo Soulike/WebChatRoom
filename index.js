@@ -23,6 +23,11 @@ app.use(koa_helmet());
 app.use(body({multipart: true}));
 
 let user_status = {};
+setInterval(function ()
+{
+	FUNCTION.socket_send(io, 'is_online', {});
+	FUNCTION.check_online(user_status,io);
+}, 120000);
 
 FUNCTION.log('服务器启动');
 
@@ -95,7 +100,7 @@ app.use(route.post('/login', async function (ctx, next)
 					ctx.body = new CONFIG.RESPONSE(true, '登陆成功');
 					await ctx.cookies.set('account', account);
 					await FUNCTION.set_identify_cookie(ctx, account, password);
-					await FUNCTION.set_status(user_status,account,CONFIG.STATUS.ONLINE,pool,io);
+					await FUNCTION.set_status(user_status, account, CONFIG.STATUS.ONLINE, pool, io);
 					FUNCTION.log(`账号${account}登陆成功`);
 				}
 				else
@@ -127,7 +132,7 @@ app.use(route.post('/get_user_info', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false);
 			else
 			{
-				user_status[account] = CONFIG.STATUS.ONLINE;
+				user_status[account] = {status:CONFIG.STATUS.ONLINE,last_respond:Date.now()};
 				const data = res.rows[0];
 				ctx.body = new CONFIG.RESPONSE(true, '', data);
 			}
@@ -154,7 +159,7 @@ app.use(route.post('/switch_status', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false, '参数错误');
 			else
 			{
-				await FUNCTION.set_status(user_status,account,status,pool,io);
+				await FUNCTION.set_status(user_status, account, status, pool, io);
 				ctx.body = new CONFIG.RESPONSE(true);
 			}
 		}
@@ -281,20 +286,20 @@ app.use(route.post('/get_list', async function (ctx, next)
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
-			user_status[account] = CONFIG.STATUS.ONLINE;
-			const online = FUNCTION.OBJECT.find_key_by_value(user_status,CONFIG.STATUS.ONLINE);
-			const leave = FUNCTION.OBJECT.find_key_by_value(user_status,CONFIG.STATUS.LEAVE);
+			user_status[account] = {status:CONFIG.STATUS.ONLINE,last_respond:Date.now()};
+			const online = FUNCTION.OBJECT.find_status(user_status, CONFIG.STATUS.ONLINE);
+			const leave = FUNCTION.OBJECT.find_status(user_status, CONFIG.STATUS.LEAVE);
 			const data = [];
-			for(const account of online)
+			for (const account of online)
 			{
-				const res = await FUNCTION.select_query(pool,['account', 'nickname', 'age', 'gender', 'customize_avatar'],{account:account});
+				const res = await FUNCTION.select_query(pool, ['account', 'nickname', 'age', 'gender', 'customize_avatar'], {account: account});
 				const row = res.rows[0];
 				row.status = CONFIG.STATUS.ONLINE;
 				data.push(row);
 			}
-			for(const account of leave)
+			for (const account of leave)
 			{
-				const res = await FUNCTION.select_query(pool,['account', 'nickname', 'age', 'gender', 'customize_avatar'],{account:account});
+				const res = await FUNCTION.select_query(pool, ['account', 'nickname', 'age', 'gender', 'customize_avatar'], {account: account});
 				const row = res.rows[0];
 				row.status = CONFIG.STATUS.LEAVE;
 				data.push(row);
@@ -324,8 +329,13 @@ io.on('message', async function (ctx, data)
 	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
 
 	FUNCTION.socket_send(io, 'new_message', message);
-	await FUNCTION.set_status(user_status,account,CONFIG.STATUS.ONLINE,pool,io);
+	await FUNCTION.set_status(user_status, account, CONFIG.STATUS.ONLINE, pool, io);
 });
 
+io.on('online',async function (ctx, data)
+{
+	const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
+	user_status[account].last_respond = Date.now();
+});
 
 app.listen(CONFIG.PORT);
