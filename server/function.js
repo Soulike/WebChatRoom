@@ -188,3 +188,42 @@ exports.COOKIE.parse = function (cookie_string)
 	}
 	return result;
 };
+
+exports.set_status = async function (user_status_obj, account, status, pool,io)
+{
+	if (parseInt(status) === CONFIG.STATUS.OFFLINE)
+	{
+		delete user_status_obj[account];
+		exports.log(`账号${account}下线`);
+	}
+	else
+		user_status_obj[account] = parseInt(status);
+
+	let data = {};
+	if (parseInt(status) === CONFIG.STATUS.ONLINE || parseInt(status) === CONFIG.STATUS.LEAVE)
+	{
+		const res = await exports.select_query(pool,
+			['account', 'nickname', 'age', 'gender', 'customize_avatar'], {account: account});
+		data = res.rows[0];
+		data.status = status;
+	}
+	else
+	{
+		data.account = account;
+		data.status = CONFIG.STATUS.OFFLINE;
+	}
+	exports.socket_send(io, 'change_status', data);
+};
+
+exports.OBJECT = {};
+exports.OBJECT.find_key_by_value = function (obj, value)
+{
+	const keys = Object.keys(obj);
+	let ret = [];
+	for(const key of keys)
+	{
+		if(obj[key] === value)
+			ret.push(key);
+	}
+	return ret;
+};

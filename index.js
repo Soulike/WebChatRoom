@@ -1,6 +1,5 @@
 const CONFIG = require('./server/config');
 const FUNCTION = require('./server/function');
-const md5 = require('blueimp-md5');
 
 const Koa = require('koa');
 const app = new Koa();
@@ -22,6 +21,8 @@ const route = require('koa-route');
 app.use(koa_static('client/'));
 app.use(koa_helmet());
 app.use(body({multipart: true}));
+
+let user_status = {};
 
 FUNCTION.log('服务器启动');
 
@@ -94,11 +95,7 @@ app.use(route.post('/login', async function (ctx, next)
 					ctx.body = new CONFIG.RESPONSE(true, '登陆成功');
 					await ctx.cookies.set('account', account);
 					await FUNCTION.set_identify_cookie(ctx, account, password);
-					await FUNCTION.update_query(pool, {status: CONFIG.STATUS.ONLINE}, {account: account});
-
-					const res = await FUNCTION.select_query(pool,
-						['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {account: account});
-					FUNCTION.socket_send(io, 'user_online', res.rows[0]);
+					await FUNCTION.set_status(user_status,account,CONFIG.STATUS.ONLINE,pool,io);
 					FUNCTION.log(`账号${account}登陆成功`);
 				}
 				else
@@ -156,19 +153,7 @@ app.use(route.post('/switch_status', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false, '参数错误');
 			else
 			{
-				await FUNCTION.update_query(pool, {status: status}, {account: account});
-				if (parseInt(status) === CONFIG.STATUS.OFFLINE || parseInt(status) === CONFIG.STATUS.WATCHING)
-				{
-					if (parseInt(status) === CONFIG.STATUS.OFFLINE)//real offline
-						FUNCTION.log(`账号${account}下线`);
-					FUNCTION.socket_send(io, 'change_status', {account: account,status:CONFIG.STATUS.OFFLINE});
-				}
-				else//online or leave
-				{
-					const res = await FUNCTION.select_query(pool,
-						['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {account: account,status:status});
-					FUNCTION.socket_send(io, 'change_status', res.rows[0]);
-				}
+				await FUNCTION.set_status(user_status,account,status,pool,io);
 				ctx.body = new CONFIG.RESPONSE(true);
 			}
 		}
@@ -294,11 +279,23 @@ app.use(route.post('/get_list', async function (ctx, next)
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
-			const res_online = await FUNCTION.select_query(pool,
-				['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {status: CONFIG.STATUS.ONLINE});
-			const res_leave = await FUNCTION.select_query(pool,
-				['account', 'nickname', 'age', 'gender', 'status', 'customize_avatar'], {status: CONFIG.STATUS.LEAVE});
-			const data = [...res_online.rows, ...res_leave.rows];
+			const online = FUNCTION.OBJECT.find_key_by_value(user_status,CONFIG.STATUS.ONLINE);
+			const leave = FUNCTION.OBJECT.find_key_by_value(user_status,CONFIG.STATUS.LEAVE);
+			const data = [];
+			for(const account of online)
+			{
+				const res = await FUNCTION.select_query(pool,['account', 'nickname', 'age', 'gender', 'customize_avatar'],{account:account});
+				const row = res.rows[0];
+				row.status = CONFIG.STATUS.ONLINE;
+				data.push(row);
+			}
+			for(const account of leave)
+			{
+				const res = await FUNCTION.select_query(pool,['account', 'nickname', 'age', 'gender', 'customize_avatar'],{account:account});
+				const row = res.rows[0];
+				row.status = CONFIG.STATUS.LEAVE;
+				data.push(row);
+			}
 			ctx.body = new CONFIG.RESPONSE(true, '列表获取成功', data);
 		}
 	} catch (error)
@@ -324,6 +321,7 @@ io.on('message', async function (ctx, data)
 	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
 
 	FUNCTION.socket_send(io, 'new_message', message);
+	await FUNCTION.set_status(user_status,account,CONFIG.STATUS.ONLINE,pool,io);
 });
 
 
