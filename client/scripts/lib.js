@@ -1,9 +1,3 @@
-$(function ()
-{
-	const $body = $('body');
-	$body.fadeIn(750);
-});
-
 const [ACCOUNT_REG, NICKNAME_REG, PASSWORD_REG, AGE_REG] =
 	[/^\d+$/, /^[A-z0-9\u4e00-\u9fa5]{1,8}$/, /^[A-z0-9]{1,32}$/, /^[0-9]+$/];
 const ALLOW_FILE_TYPES = ['jpeg', 'png'];
@@ -273,4 +267,10 @@ $(function ()
 	{
 		$(event.target).removeAttr('style');
 	})
+});
+
+$(function ()
+{
+	const $container = $('.container');
+	$container.fadeIn(750);
 });
