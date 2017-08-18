@@ -1,8 +1,11 @@
 body {
     font-size: 20px;
     font-family: "Noto Sans CJK SC Regular", "微软雅黑", sans-serif;
-    display: none;
     background-size: cover;
+}
+
+.container{
+    display: none;
 }
 
 .center {
