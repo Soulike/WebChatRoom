@@ -226,7 +226,7 @@ $(function ()
 	})
 });
 
-function switch_status_to(status)
+function switch_status_to(status,async = true)
 {
 	const $status_icon = $('#status-icon');
 	AJAX('switch_status', {status: status},
@@ -248,7 +248,7 @@ function switch_status_to(status)
 		{
 			console.log(error.stack);
 			show_tip('状态切换失败', 'error');
-		});
+		},async);
 }
 
 /**Upload avatar preview**/
@@ -631,7 +631,7 @@ function dialog_add_row(message_obj)
 /**Online/Offline switch**/
 window.onunload = function ()
 {
-	switch_status_to(OFFLINE);
+	switch_status_to(OFFLINE,false);
 	socket.close();
 };
 
