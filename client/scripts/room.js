@@ -303,7 +303,7 @@ $(function ()
 			{
 				show_tip('发生错误，请重试', 'error');
 				console.log(error);
-			});
+			}, $background_upload_progress_bar);
 	})
 });
 
