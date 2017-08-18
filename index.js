@@ -127,6 +127,7 @@ app.use(route.post('/get_user_info', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false);
 			else
 			{
+				user_status[account] = CONFIG.STATUS.ONLINE;
 				const data = res.rows[0];
 				ctx.body = new CONFIG.RESPONSE(true, '', data);
 			}
@@ -275,10 +276,12 @@ app.use(route.post('/get_list', async function (ctx, next)
 {
 	try
 	{
+		const account = ctx.cookies.get('account');
 		if (!FUNCTION.validate_cookie(ctx, pool))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
+			user_status[account] = CONFIG.STATUS.ONLINE;
 			const online = FUNCTION.OBJECT.find_key_by_value(user_status,CONFIG.STATUS.ONLINE);
 			const leave = FUNCTION.OBJECT.find_key_by_value(user_status,CONFIG.STATUS.LEAVE);
 			const data = [];
