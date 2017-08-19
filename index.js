@@ -327,7 +327,6 @@ io.on('message', async function (ctx, data)
 	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
 
 	FUNCTION.socket_send(io, 'new_message', message);
-	await FUNCTION.set_status(user_status, account, CONFIG.STATUS.ONLINE, pool, io);
 });
 
 io.on('online',async function (ctx, data)
