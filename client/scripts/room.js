@@ -472,6 +472,7 @@ $(function ()
 	{
 		const message = new Message($dialog_textarea.css('fontFamily'), $dialog_textarea.css('fontWeight'), $dialog_textarea.css('fontSize'), $dialog_textarea.val());
 		socket.emit('message', message);
+		console.log(1);
 		$dialog_textarea.val('');
 		$message_length_span.text(`0/${MESSAGE_MAX_LENGTH}`);
 		$dialog_submit_button.attr('disabled', 'disabled');
