@@ -437,7 +437,7 @@ socket.on('change_avatar', function (data)
 	list_change_avatar(data);
 });
 
-socket.on('new_message', function (data)
+socket.on('receive_message', function (data)
 {
 	dialog_add_row(data);
 });
@@ -471,7 +471,7 @@ $(function ()
 	function send_message()
 	{
 		const message = new Message($dialog_textarea.css('fontFamily'), $dialog_textarea.css('fontWeight'), $dialog_textarea.css('fontSize'), $dialog_textarea.val());
-		socket.emit('message', message);
+		socket.emit('send_message', message);
 		$dialog_textarea.val('');
 		$message_length_span.text(`0/${MESSAGE_MAX_LENGTH}`);
 		$dialog_submit_button.attr('disabled', 'disabled');

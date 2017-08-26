@@ -315,9 +315,8 @@ app.use(route.post('/get_list', async function (ctx, next)
 /**Socket**/
 io.on('connection',function ()
 {
-	io.on('message', async function (ctx, data)
+	io.on('send_message', async function (ctx, data)
 	{
-		console.log(1);
 		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
 		const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
 		const {nickname} = res.rows[0];
@@ -329,7 +328,7 @@ io.on('connection',function ()
 
 		const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
 
-		FUNCTION.socket_send(io, 'new_message', message);
+		FUNCTION.socket_send(io, 'receive_message', message);
 	});
 
 	io.on('online',async function (ctx, data)
