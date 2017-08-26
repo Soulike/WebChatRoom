@@ -23,10 +23,10 @@ app.use(koa_helmet());
 app.use(body({multipart: true}));
 
 let user_status = {};
-setInterval(function ()
+setInterval(async function ()
 {
-	FUNCTION.socket_send(io, 'is_online', {});
-	FUNCTION.check_online(user_status,io);
+	await FUNCTION.socket_send(io, 'is_online', {});
+	await FUNCTION.check_online(user_status,io);
 }, 120000);
 
 FUNCTION.log('服务器启动');

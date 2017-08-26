@@ -1,5 +1,3 @@
-const socket = io.connect(`http://${DOMAIN}:${PORT}`);
-
 /**Get user's info**/
 $(function ()
 {
@@ -420,6 +418,7 @@ $(function ()
 /**Socket**/
 $(function ()
 {
+	const socket = io.connect(`http://${DOMAIN}:${PORT}`);
 	socket.on('change_status', function (data)
 	{
 		change_status(data);
@@ -637,7 +636,6 @@ function dialog_add_row(message_obj)
 window.onunload = function ()
 {
 	switch_status_to(OFFLINE,false);
-	socket.close();
 };
 
 $(function ()

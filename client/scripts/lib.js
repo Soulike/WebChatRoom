@@ -113,18 +113,6 @@ function modify_popover_content_by_id(id_array = [], content)
 	}
 }
 
-function tip_by_className(className, content, position = 'left')
-{
-	$(`.${className}`).tooltip(
-		{
-			container: 'body',
-			placement: `${position}`,
-			trigger: 'focus hover',
-			title: `${content}`
-		}
-	);
-}
-
 function change_border_color_to($selector_array, color = 'red')
 {
 	for (const selector of $selector_array)
