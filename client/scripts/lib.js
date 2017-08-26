@@ -163,11 +163,11 @@ function is_existent(file_relative_path)
 	let status = true;
 	$.ajax(
 		{
+			method:'HEAD',
 			contentType: 'text/plain',
 			timeout: 2000,
 			url: `http://${DOMAIN}:${PORT}/${file_relative_path}`,
-			method: 'get',
-			async: false,
+			async:false,
 			success: function ()
 			{
 				status = true;

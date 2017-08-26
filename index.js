@@ -316,7 +316,6 @@ app.use(route.post('/get_list', async function (ctx, next)
 io.on('connection',function ()
 {
 	FUNCTION.socket_send(io,'success',{});
-	console.log(1);
 	io.on('message', async function (ctx, data)
 	{
 		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
