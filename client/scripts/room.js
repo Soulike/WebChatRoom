@@ -464,7 +464,6 @@ $(function ()
 		if (event.which === 13)
 		{
 			event.preventDefault();
-			console.log(1);
 			send_message();
 		}
 	});
