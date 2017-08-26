@@ -268,9 +268,3 @@ $(function ()
 		$(event.target).removeAttr('style');
 	})
 });
-
-$(function ()
-{
-	const $container = $('.container');
-	$container.fadeIn(750);
-});

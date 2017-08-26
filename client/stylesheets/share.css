@@ -4,10 +4,6 @@ body {
     background-size: cover;
 }
 
-.container{
-    display: none;
-}
-
 .center {
     position: absolute;
     top: 50%;

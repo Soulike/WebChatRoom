@@ -1,3 +1,7 @@
+.container{
+    width: 1280px;
+}
+
 #style-btn{
     position: fixed;
     top: 1%;

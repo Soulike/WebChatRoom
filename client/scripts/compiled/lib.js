@@ -3,4 +3,4 @@ var DOMAIN='47.94.152.219',PORT=80;var MESSAGE_MAX_LENGTH=50;var Register_info=f
 var myXhr=$.ajaxSettings.xhr();if($progress_bar){if(myXhr.upload){//检查upload属性是否存在
 myXhr.upload.addEventListener('progress',function(event)//绑定progress事件的回调函数
 {if(event.lengthComputable){var percent=event.loaded/event.total*100;$progress_bar.css('width',percent+'%');}},false);}}return myXhr;//xhr对象返回给jQuery使用
-}});}$(function(){$('input').focus(function(event){$(event.target).removeAttr('style');});});$(function(){var $container=$('.container');$container.fadeIn(750);});
+}});}$(function(){$('input').focus(function(event){$(event.target).removeAttr('style');});});
