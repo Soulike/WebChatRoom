@@ -224,7 +224,7 @@ $(function ()
 	})
 });
 
-function switch_status_to(status,async = true)
+function switch_status_to(status, async = true)
 {
 	const $status_icon = $('#status-icon');
 	AJAX('switch_status', {status: status},
@@ -246,7 +246,7 @@ function switch_status_to(status,async = true)
 		{
 			console.log(error.stack);
 			show_tip('状态切换失败', 'error');
-		},async);
+		}, async);
 }
 
 /**Upload avatar preview**/
@@ -417,7 +417,7 @@ $(function ()
 
 /**Socket**/
 const socket = io(`http://${DOMAIN}`);
-$(function ()
+socket.on('connection',function ()
 {
 	socket.on('change_status', function (data)
 	{
@@ -444,9 +444,9 @@ $(function ()
 		dialog_add_row(data);
 	});
 
-	socket.on('is_online',function (data)
+	socket.on('is_online', function (data)
 	{
-		socket.emit('online',{});
+		socket.emit('online', {});
 	});
 });
 
@@ -635,7 +635,8 @@ function dialog_add_row(message_obj)
 /**Online/Offline switch**/
 window.onunload = function ()
 {
-	switch_status_to(OFFLINE,false);
+	switch_status_to(OFFLINE, false);
+	socket.close();
 };
 
 $(function ()

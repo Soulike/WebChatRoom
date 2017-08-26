@@ -313,26 +313,30 @@ app.use(route.post('/get_list', async function (ctx, next)
 }));
 
 /**Socket**/
-io.on('message', async function (ctx, data)
+io.on('connection',function ()
 {
-	const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
-	const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
-	const {nickname} = res.rows[0];
+	io.on('message', async function (ctx, data)
+	{
+		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
+		const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
+		const {nickname} = res.rows[0];
 
-	const {font, bold, font_size, content} = ctx.data;
+		const {font, bold, font_size, content} = ctx.data;
 
-	const date = new Date();
-	const send_time = `${date.getHours()}时${date.getMinutes()}分`;
+		const date = new Date();
+		const send_time = `${date.getHours()}时${date.getMinutes()}分`;
 
-	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
+		const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
 
-	FUNCTION.socket_send(io, 'new_message', message);
+		FUNCTION.socket_send(io, 'new_message', message);
+	});
+
+	io.on('online',async function (ctx, data)
+	{
+		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
+		user_status[account].last_respond = Date.now();
+	});
 });
 
-io.on('online',async function (ctx, data)
-{
-	const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
-	user_status[account].last_respond = Date.now();
-});
 
 app.listen(CONFIG.PORT);
