@@ -416,7 +416,7 @@ $(function ()
 });
 
 /**Socket**/
-const socket = io(`http://${DOMAIN}:${PORT}`);
+const socket = io(`http://${DOMAIN}`);
 $(function ()
 {
 	socket.on('change_status', function (data)
