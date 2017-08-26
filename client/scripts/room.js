@@ -417,37 +417,34 @@ $(function ()
 
 /**Socket**/
 const socket = io(`http://${DOMAIN}`);
-socket.on('connection',function ()
+socket.on('change_status', function (data)
 {
-	socket.on('change_status', function (data)
-	{
-		change_status(data);
-	});
+	change_status(data);
+});
 
-	socket.on('current_list', function (data)
-	{
-		list_add_row(data);
-	});
+socket.on('current_list', function (data)
+{
+	list_add_row(data);
+});
 
-	socket.on('modify_info', function (data)
-	{
-		list_modify_info(data);
-	});
+socket.on('modify_info', function (data)
+{
+	list_modify_info(data);
+});
 
-	socket.on('change_avatar', function (data)
-	{
-		list_change_avatar(data);
-	});
+socket.on('change_avatar', function (data)
+{
+	list_change_avatar(data);
+});
 
-	socket.on('new_message', function (data)
-	{
-		dialog_add_row(data);
-	});
+socket.on('new_message', function (data)
+{
+	dialog_add_row(data);
+});
 
-	socket.on('is_online', function (data)
-	{
-		socket.emit('online', {});
-	});
+socket.on('is_online', function (data)
+{
+	socket.emit('online', {});
 });
 
 /**Send Message**/
