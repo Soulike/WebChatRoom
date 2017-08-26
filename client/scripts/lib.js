@@ -60,7 +60,7 @@ function AJAX(action, data, success_function, error_function, async = true)
 				withCredentials: true
 			},
 			contentType: 'application/json',
-			timeout: 2000,
+			timeout: 500,
 			async: async,
 			dataType: 'json',
 			url: `http://${DOMAIN}:${PORT}/${action}`,
