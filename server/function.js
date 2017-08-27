@@ -169,9 +169,9 @@ exports.clear_files = function (account, type)
 		exports.delete_file(`client/images/${type}s/${account}.${file_type}`);
 };
 
-exports.socket_send = function (io, event, data)
+exports.socket_send = async function (io, event, data)
 {
-	io.broadcast(`${event}`, data);
+	await io.broadcast(`${event}`, data);
 };
 
 exports.COOKIE = {};
@@ -218,7 +218,7 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 		data.account = account;
 		data.status = CONFIG.STATUS.OFFLINE;
 	}
-	exports.socket_send(io, 'change_status', data);
+	await exports.socket_send(io, 'change_status', data);
 };
 
 exports.OBJECT = {};
