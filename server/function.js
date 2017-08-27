@@ -243,6 +243,7 @@ exports.check_online = async function (redis_client, io)
 		if (now - (parseInt(await redis_client.hmgetAsync(account, 'last_respond'))) > CONFIG.STATUS.MAX_OFFLINE_WAITING_SECONDS * 1000)
 		{
 			await exports.set_status(redis_client, parseInt(account), CONFIG.STATUS.OFFLINE, undefined, io);
+			console.log(2333);
 		}
 	}
 };
