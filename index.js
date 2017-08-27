@@ -36,7 +36,7 @@ app.use(body({multipart: true}));
 setInterval(async function ()
 {
 	await FUNCTION.socket_send(io, 'is_online', {});
-	await FUNCTION.check_online(client, io);
+	await FUNCTION.check_online(client, io,pool);
 }, CONFIG.STATUS.CHECK_ONLINE_SECONDS * 1000);
 
 if (cluster.isMaster)

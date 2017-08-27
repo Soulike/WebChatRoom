@@ -172,8 +172,6 @@ exports.clear_files = function (account, type)
 exports.socket_send = async function (io, event, data)
 {
 	await io.broadcast(`${event}`, data);
-	console.log(event);
-	console.log(data);
 };
 
 exports.COOKIE = {};
@@ -236,7 +234,7 @@ exports.OBJECT.find_status = async function (redis_client, status)
 	return ret;
 };
 
-exports.check_online = async function (redis_client, io)
+exports.check_online = async function (redis_client, io,pool)
 {
 	const now = Date.now();
 	const keys = (await redis_client.scanAsync(0))[1];
@@ -244,7 +242,7 @@ exports.check_online = async function (redis_client, io)
 	{
 		if (now - (parseInt(await redis_client.hmgetAsync(account, 'last_respond'))) > CONFIG.STATUS.MAX_OFFLINE_WAITING_SECONDS * 1000)
 		{
-			await exports.set_status(redis_client, account, CONFIG.STATUS.OFFLINE, undefined, io);
+			await exports.set_status(redis_client, account, CONFIG.STATUS.OFFLINE, pool, io);
 		}
 	}
 };
