@@ -419,7 +419,6 @@ $(function ()
 const socket = io(`http://${DOMAIN}`);
 socket.on('change_status', function (data)
 {
-	console.log(data);
 	change_status(data);
 });
 
