@@ -5,7 +5,7 @@ const CONFIG = require('./config');
 exports.log = function (content)
 {
 	const date = new Date();
-	console.log(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} PID: ${process.pid}: ${content}`);
+	console.log(`${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)}-${(date.getDate() + 1) < 10 ? '0' + (date.getDate() + 1) : (date.getDate() + 1)} ${(date.getHours() + 1) < 10 ? '0' + (date.getHours() + 1) : (date.getHours() + 1)}:${(date.getMinutes() + 1) < 10 ? '0' + (date.getMinutes() + 1) : (date.getMinutes() + 1)}:${(date.getSeconds() + 1) < 10 ? '0' + (date.getSeconds() + 1) : (date.getSeconds() + 1)} PID: ${process.pid}: ${content}`);
 };
 
 /**database return value
@@ -169,9 +169,9 @@ exports.clear_files = function (account, type)
 		exports.delete_file(`client/images/${type}s/${account}.${file_type}`);
 };
 
-exports.socket_send = async function (io, event, data)
+exports.socket_send = function (io, event, data)
 {
-	await io.broadcast(`${event}`, data);
+	io.broadcast(`${event}`, data);
 };
 
 exports.COOKIE = {};
@@ -234,7 +234,7 @@ exports.OBJECT.find_status = async function (redis_client, status)
 	return ret;
 };
 
-exports.check_online = async function (redis_client, io,pool)
+exports.check_online = async function (redis_client, io, pool)
 {
 	const now = Date.now();
 	const keys = (await redis_client.scanAsync(0))[1];

@@ -32,7 +32,7 @@ app.use(body({multipart: true}));
 
 setInterval(async function ()
 {
-	await FUNCTION.socket_send(io, 'is_online', {});
+	FUNCTION.socket_send(io, 'is_online', {});
 	await FUNCTION.check_online(client, io, pool);
 }, CONFIG.STATUS.CHECK_ONLINE_SECONDS * 1000);
 
@@ -47,12 +47,6 @@ client.on('connect', async function ()
 client.on('error', function (error)
 {
 	FUNCTION.log(`Redis 错误，错误信息：\n${error.stack}`);
-});
-
-client.on('end', async function ()
-{
-	await client.flushallAsync();
-	FUNCTION.log('服务器关闭，Redis清空');
 });
 
 /**Socket**/
@@ -84,12 +78,12 @@ app.use(route.post('/register', async function (ctx, next)
 	const {nickname, password} = ctx.request.body;
 	try
 	{
-		if (!CONFIG.REG.NICKNAME.test(nickname))
+		if (nickname === undefined || !CONFIG.REG.NICKNAME.test(nickname))
 		{
 			ctx.body = new CONFIG.RESPONSE(false, '昵称不合法');
 			FUNCTION.log(`注册失败：昵称不合法`);
 		}
-		else if (!CONFIG.REG.PASSWORD.test(password))
+		else if (password === undefined || !CONFIG.REG.PASSWORD.test(password))
 		{
 			ctx.body = new CONFIG.RESPONSE(false, '密码不合法');
 			FUNCTION.log(`注册失败：密码不合法`);
@@ -116,7 +110,7 @@ app.use(route.post('/login', async function (ctx, next)
 	FUNCTION.log(`账号${account}尝试登录`);
 	try
 	{
-		if (!CONFIG.REG.ACCOUNT.test(account))
+		if (account === undefined || !CONFIG.REG.ACCOUNT.test(account))
 		{
 			ctx.body = new CONFIG.RESPONSE(false, '账号不存在');
 			FUNCTION.log(`账号${account}登陆失败：账号不存在`);
@@ -126,7 +120,7 @@ app.use(route.post('/login', async function (ctx, next)
 			ctx.body = new CONFIG.RESPONSE(false, '账号不存在');
 			FUNCTION.log(`账号${account}登陆失败：账号不存在`);
 		}
-		else if (!CONFIG.REG.PASSWORD.test(password))
+		else if (password === undefined || !CONFIG.REG.PASSWORD.test(password))
 		{
 			ctx.body = new CONFIG.RESPONSE(false, '密码错误');
 			FUNCTION.log(`账号${account}登录失败：密码错误`);
@@ -170,7 +164,7 @@ app.use(route.post('/get_user_info', async function (ctx, next)
 	const account = parseInt(ctx.cookies.get('account'));
 	try
 	{
-		if (!FUNCTION.validate_cookie(ctx, pool))
+		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -198,7 +192,7 @@ app.use(route.post('/switch_status', async function (ctx, next)
 	const {status} = ctx.request.body;
 	try
 	{
-		if (!FUNCTION.validate_cookie(ctx, pool))
+		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -227,7 +221,7 @@ app.use(route.post('/background_upload', async function (ctx, next)
 	const file_path = `${background_path}/${account}.${file_type}`;
 	try
 	{
-		if (!FUNCTION.validate_cookie(ctx, pool))
+		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -255,7 +249,7 @@ app.use(route.post('/avatar_upload', async function (ctx, next)
 	const file_path = `${avatar_path}/${account}.${file_type}`;
 	try
 	{
-		if (!FUNCTION.validate_cookie(ctx, pool))
+		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -285,9 +279,9 @@ app.use(route.post('/modify_info', async function (ctx, next)
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
-			if (!CONFIG.REG.NICKNAME.test(nickname))
+			if (nickname === undefined || !CONFIG.REG.NICKNAME.test(nickname))
 				ctx.body = new CONFIG.RESPONSE(false, '昵称非法');
-			else if (!CONFIG.REG.AGE.test(age))
+			else if (age === undefined || !CONFIG.REG.AGE.test(age))
 				ctx.body = new CONFIG.RESPONSE(false, '年龄非法');
 			else if (typeof gender !== "boolean")
 				ctx.body = new CONFIG.RESPONSE(false, '性别非法');
