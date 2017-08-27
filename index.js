@@ -52,6 +52,29 @@ if (cluster.isMaster)
 	{
 		console.log(`工作进程 ${worker.process.pid} 已退出`);
 	});
+
+	/**Socket**/
+	io.on('send_message', async function (ctx, data)
+	{
+		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
+		const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
+		const {nickname} = res.rows[0];
+
+		const {font, bold, font_size, content} = ctx.data;
+
+		const date = new Date();
+		const send_time = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}时${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}分`;
+
+		const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
+
+		FUNCTION.socket_send(io, 'receive_message', message);
+	});
+
+	io.on('online', async function (ctx, data)
+	{
+		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
+		await client.hmsetAsync(account, {last_respond: Date.now()});
+	});
 }
 else
 {
@@ -354,30 +377,5 @@ else
 		}
 		await next();
 	}));
-
-	/**Socket**/
-	io.on('send_message', async function (ctx, data)
-	{
-		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
-		const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
-		const {nickname} = res.rows[0];
-
-		const {font, bold, font_size, content} = ctx.data;
-
-		const date = new Date();
-		const send_time = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}时${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}分`;
-
-		const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
-
-		FUNCTION.socket_send(io, 'receive_message', message);
-	});
-
-	io.on('online', async function (ctx, data)
-	{
-		const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
-		await client.hmsetAsync(account, {last_respond: Date.now()});
-	});
-
-
 	app.listen(CONFIG.PORT);
 }
