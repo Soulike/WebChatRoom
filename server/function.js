@@ -193,13 +193,11 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 {
 	if (parseInt(status) === CONFIG.STATUS.OFFLINE)
 	{
-		//delete user_status_obj[account];
 		await redis_client.delAsync(account);
 		exports.log(`账号${account}下线`);
 	}
 	else
 	{
-		//user_status_obj[account] = {status: parseInt(status), last_respond: Date.now()};
 		await redis_client.hmsetAsync(account, {status: parseInt(status), last_respond: Date.now()});
 	}
 
