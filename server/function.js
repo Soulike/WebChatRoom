@@ -243,6 +243,7 @@ exports.check_online = async function (redis_client, io)
 			await redis_client.delAsync(account);
 			exports.log(`账号${account}下线`);
 			exports.socket_send(io, 'change_status', {account: account, status: CONFIG.STATUS.OFFLINE});
+			console.log(1);
 		}
 	}
 };
