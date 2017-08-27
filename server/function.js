@@ -137,6 +137,8 @@ exports.set_identify_cookie = function (ctx, account, password)
 exports.validate_cookie = async function (ctx, pool)
 {
 	const account = ctx.cookies.get('account');
+	if (account === undefined)
+		return false;
 	if (!CONFIG.REG.ACCOUNT.test(account))
 		return false;
 	const value = ctx.cookies.get(md5(account));
@@ -191,6 +193,8 @@ exports.COOKIE.parse = function (cookie_string)
 
 exports.set_status = async function (redis_client, account, status, pool, io)
 {
+	if (account === undefined)
+		return;
 	if (parseInt(status) === CONFIG.STATUS.OFFLINE)
 	{
 		await redis_client.delAsync(account);
@@ -215,7 +219,6 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 		data.status = CONFIG.STATUS.OFFLINE;
 	}
 	exports.socket_send(io, 'change_status', data);
-	console.log(data);
 };
 
 exports.OBJECT = {};
@@ -239,7 +242,7 @@ exports.check_online = async function (redis_client, io)
 	{
 		if (now - (parseInt(await redis_client.hmgetAsync(account, 'last_respond'))) > CONFIG.STATUS.MAX_OFFLINE_WAITING_SECONDS * 1000)
 		{
-			await exports.set_status(redis_client,parseInt(account),CONFIG.STATUS.OFFLINE,undefined,io);
+			await exports.set_status(redis_client, parseInt(account), CONFIG.STATUS.OFFLINE, undefined, io);
 		}
 	}
 };
