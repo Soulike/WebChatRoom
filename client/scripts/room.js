@@ -507,7 +507,6 @@ function list_add_row(info_obj)
 				file_type = file_t;
 				break;
 			}
-
 		$list_table.append(`
 	<div class="table-row-display online-person" id=${account}>
  <div class="table-cell-display list-avatar-div"><img src="images/avatars/${avatar}.${file_type}" alt="avatar" class="list-avatar img-circle rotate" id=${account}_avatar>
@@ -564,7 +563,9 @@ function change_status(info_obj)
 		return;
 	}
 	else if (parseInt(status) === ONLINE || parseInt(status) === LEAVE)
+	{
 		list_add_row(info_obj);
+	}
 
 	const status_icon_span = $(`#${account}_status`);
 	status_icon_span.removeAttr('class');

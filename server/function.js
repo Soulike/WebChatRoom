@@ -5,7 +5,7 @@ const CONFIG = require('./config');
 exports.log = function (content)
 {
 	const date = new Date();
-	console.log(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${content}`);
+	console.log(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} PID: ${process.pid}: ${content}`);
 };
 
 /**database return value
@@ -189,15 +189,19 @@ exports.COOKIE.parse = function (cookie_string)
 	return result;
 };
 
-exports.set_status = async function (user_status_obj, account, status, pool, io)
+exports.set_status = async function (redis_client, account, status, pool, io)
 {
 	if (parseInt(status) === CONFIG.STATUS.OFFLINE)
 	{
-		delete user_status_obj[account];
+		//delete user_status_obj[account];
+		await redis_client.delAsync(account);
 		exports.log(`账号${account}下线`);
 	}
 	else
-		user_status_obj[account] = {status: parseInt(status), last_respond: Date.now()};
+	{
+		//user_status_obj[account] = {status: parseInt(status), last_respond: Date.now()};
+		await redis_client.hmsetAsync(account, {status: parseInt(status), last_respond: Date.now()});
+	}
 
 	let data = {};
 	if (parseInt(status) === CONFIG.STATUS.ONLINE || parseInt(status) === CONFIG.STATUS.LEAVE)
@@ -216,29 +220,29 @@ exports.set_status = async function (user_status_obj, account, status, pool, io)
 };
 
 exports.OBJECT = {};
-exports.OBJECT.find_status = function (obj, status)
+exports.OBJECT.find_status = async function (redis_client, status)
 {
-	const keys = Object.keys(obj);
+	const keys = (await redis_client.scanAsync(0))[1];
 	let ret = [];
 	for (const key of keys)
 	{
-		if (obj[key].status === status)
+		if (parseInt(await redis_client.hmgetAsync(key, 'status')) === status)
 			ret.push(key);
 	}
 	return ret;
 };
 
-exports.check_online = function (user_status_obj, io)
+exports.check_online = async function (redis_client, io)
 {
 	const now = Date.now();
-	const keys = Object.keys(user_status_obj);
+	const keys = (await redis_client.scanAsync(0))[1];
 	for (const account of keys)
 	{
-		if (user_status_obj[account].last_respond - now > 3000000)
+		if (now - (parseInt(await redis_client.hmgetAsync(account, 'last_respond'))) > CONFIG.STATUS.MAX_OFFLINE_WAITING_SECONDS * 1000)
 		{
-			delete user_status_obj[account];
+			await redis_client.delAsync(account);
 			exports.log(`账号${account}下线`);
-			exports.socket_send(io, 'change_status', {account:account,status:CONFIG.STATUS.OFFLINE});
+			exports.socket_send(io, 'change_status', {account: account, status: CONFIG.STATUS.OFFLINE});
 		}
 	}
 };
