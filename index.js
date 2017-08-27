@@ -139,7 +139,9 @@ app.use(route.post('/login', async function (ctx, next)
 				if (password === right_password)
 				{
 					ctx.body = new CONFIG.RESPONSE(true, '登陆成功');
-					await ctx.cookies.set('account', account);
+					await ctx.cookies.set('account', account,{
+						SameSite:'Strict',
+					});
 					await FUNCTION.set_identify_cookie(ctx, account, password);
 					await FUNCTION.set_status(client, account, CONFIG.STATUS.ONLINE, pool, io);
 					FUNCTION.log(`账号${account}登陆成功`);

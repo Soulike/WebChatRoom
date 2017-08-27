@@ -131,7 +131,10 @@ exports.update_query = function (pool, new_info_obj, filters_obj, logic = 'AND')
 exports.set_identify_cookie = function (ctx, account, password)
 {
 	const date = new Date();
-	ctx.cookies.set(md5(account), md5(account + password + date.toDateString()));
+	ctx.cookies.set(md5(account), md5(account + password + date.toDateString()),
+	{
+		SameSite:'Strict',
+	})
 };
 
 exports.validate_cookie = async function (ctx, pool)
