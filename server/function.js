@@ -240,10 +240,7 @@ exports.check_online = async function (redis_client, io)
 	{
 		if (now - (parseInt(await redis_client.hmgetAsync(account, 'last_respond'))) > CONFIG.STATUS.MAX_OFFLINE_WAITING_SECONDS * 1000)
 		{
-			await redis_client.delAsync(account);
-			exports.log(`账号${account}下线`);
-			exports.socket_send(io, 'change_status', {account: account, status: CONFIG.STATUS.OFFLINE});
-			console.log(1);
+			await exports.set_status(redis_client,account,CONFIG.STATUS.OFFLINE,undefined,io);
 		}
 	}
 };
