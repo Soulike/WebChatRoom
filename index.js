@@ -140,7 +140,6 @@ app.use(route.post('/login', async function (ctx, next)
 				{
 					ctx.body = new CONFIG.RESPONSE(true, '登陆成功');
 					await ctx.cookies.set('account', account,  {
-						domain: CONFIG.DOMAIN,  // 写cookie所在的域名
 						path: '/room.html',       // 写cookie所在的路径
 						httpOnly: false,  // 是否只用于http请求中获取
 						overwrite: false  // 是否允许重写

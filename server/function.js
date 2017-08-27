@@ -132,7 +132,6 @@ exports.set_identify_cookie = function (ctx, account, password)
 {
 	const date = new Date();
 	ctx.cookies.set(md5(account), md5(account + password + date.toDateString()),{
-		domain: CONFIG.DOMAIN,  // 写cookie所在的域名
 		path: '/room.html',       // 写cookie所在的路径
 		httpOnly: false,  // 是否只用于http请求中获取
 		overwrite: false  // 是否允许重写
