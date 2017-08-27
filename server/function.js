@@ -199,6 +199,11 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 	{
 		await redis_client.delAsync(account);
 		exports.log(`账号${account}下线`);
+		await ctx.cookies.set('account', account,  {
+			maxAge: 0,
+			httpOnly: true,  // 是否只用于http请求中获取
+			overwrite: false  // 是否允许重写
+		});
 	}
 	else
 	{
