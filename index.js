@@ -33,12 +33,6 @@ app.use(koa_static('client/'));
 app.use(koa_helmet());
 app.use(body({multipart: true}));
 
-setInterval(async function ()
-{
-	await FUNCTION.socket_send(io, 'is_online', {});
-	await FUNCTION.check_online(client, io,pool);
-}, CONFIG.STATUS.CHECK_ONLINE_SECONDS * 1000);
-
 if (cluster.isMaster)
 {
 	FUNCTION.log(`主进程 ${process.pid} 启动`);
@@ -52,6 +46,12 @@ if (cluster.isMaster)
 	{
 		console.log(`工作进程 ${worker.process.pid} 已退出`);
 	});
+
+	setInterval(async function ()
+	{
+		await FUNCTION.socket_send(io, 'is_online', {});
+		await FUNCTION.check_online(client, io,pool);
+	}, CONFIG.STATUS.CHECK_ONLINE_SECONDS * 1000);
 
 	/**Socket**/
 	io.on('send_message', async function (ctx, data)
