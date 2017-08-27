@@ -3,10 +3,17 @@ const FUNCTION = require('./server/function');
 
 const Koa = require('koa');
 const app = new Koa();
+
 const Io = require('koa-socket');
 const io = new Io();
-
 io.attach(app);
+
+const redis = require("redis");
+const client = redis.createClient();
+
+const Promise = require("bluebird");
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 
 const {Pool} = require('pg');
 const pool = new Pool(CONFIG.DATABASE_CONFIG);
@@ -30,6 +37,10 @@ setInterval(async function ()
 }, 120000);
 
 FUNCTION.log('服务器启动');
+
+client.on("error", function (error) {
+	FUNCTION.log(`Redis 错误，错误信息：\n${error}`);
+});
 
 app.use(route.post('/register', async function (ctx, next)
 {
