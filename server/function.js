@@ -215,6 +215,7 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 		data.status = CONFIG.STATUS.OFFLINE;
 	}
 	exports.socket_send(io, 'change_status', data);
+	console.log(data);
 };
 
 exports.OBJECT = {};
