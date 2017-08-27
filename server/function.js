@@ -172,6 +172,7 @@ exports.clear_files = function (account, type)
 exports.socket_send = async function (io, event, data)
 {
 	await io.broadcast(`${event}`, data);
+	await console.log(data);
 };
 
 exports.COOKIE = {};
