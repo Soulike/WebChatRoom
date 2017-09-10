@@ -132,14 +132,19 @@ app.use(route.post('/login', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false, '账号不存在');
 				FUNCTION.log(`账号${account}登陆失败：账号不存在`);
 			}
+			else if (((await client.scanAsync(0))[1]).indexOf(account) !== -1)
+			{
+				ctx.body = new CONFIG.RESPONSE(false, '账号已登录');
+				FUNCTION.log(`账号${account}登陆失败：账号已登录`);
+			}
 			else
 			{
 				const right_password = response.rows[0].password;
 				if (password === right_password)
 				{
 					ctx.body = new CONFIG.RESPONSE(true, '登陆成功');
-					await ctx.cookies.set('account', account,{
-						SameSite:'Strict',
+					await ctx.cookies.set('account', account, {
+						SameSite: 'Strict',
 					});
 					await FUNCTION.set_identify_cookie(ctx, account, password);
 					await FUNCTION.set_status(client, account, CONFIG.STATUS.ONLINE, pool, io);
