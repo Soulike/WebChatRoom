@@ -1,3 +1,5 @@
+const socket = io(`http://${DOMAIN}:${PORT}`);
+
 /**Get user's info**/
 $(function ()
 {
@@ -415,7 +417,6 @@ $(function ()
 });
 
 /**Socket**/
-const socket = io(`http://${DOMAIN}:${PORT}`);
 socket.on('change_status', function (data)
 {
 	change_status(data);
