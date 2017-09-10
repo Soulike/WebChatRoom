@@ -447,6 +447,11 @@ socket.on('is_online', function (data)
 	socket.emit('online', {});
 });
 
+socket.on('disconnect',function ()
+{
+	show_error_modal();
+});
+
 /**Send Message**/
 $(function ()
 {
