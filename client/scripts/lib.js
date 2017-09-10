@@ -8,7 +8,7 @@ const STATUS_ICONS = {
 	WATCHING: 'glyphicon-eye-open',
 	LEAVE: 'glyphicon-glass',
 };
-//const [DOMAIN, PORT] = ['127.0.0.1', 80];
+//const [DOMAIN, PORT] = ['127.0.0.1', 3000];
 const [DOMAIN, PORT] = ['47.94.152.219', 80];
 
 const MESSAGE_MAX_LENGTH = 50;

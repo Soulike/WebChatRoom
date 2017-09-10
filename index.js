@@ -62,7 +62,6 @@ io.on('send_message', async function (ctx, data)
 	const send_time = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}时${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}分`;
 
 	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
-
 	FUNCTION.socket_send(io, 'receive_message', message);
 });
 

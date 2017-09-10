@@ -147,7 +147,6 @@ $(function ()
 		e.preventDefault();
 		const font_style = e.target.text;
 		$dialog_textarea.css('fontFamily', `${font_style},serif`);
-
 	});
 
 	$font_size.click((e) =>
@@ -416,7 +415,7 @@ $(function ()
 });
 
 /**Socket**/
-const socket = io(`http://${DOMAIN}`);
+const socket = io(`http://${DOMAIN}:${PORT}`);
 socket.on('change_status', function (data)
 {
 	change_status(data);
