@@ -1,9 +1,9 @@
 const socket = io(`http://${DOMAIN}:${PORT}`);
 /**Socket**/
-socket.on('connect', async function ()
+socket.on('connect', function ()
 {
-	await socket.emit('join', {account: sessionStorage.getItem('account')});
-	await sessionStorage.clear();
+	socket.emit('join', {account: sessionStorage.getItem('account')});
+	sessionStorage.clear();
 	get_info();
 	get_list();
 });
