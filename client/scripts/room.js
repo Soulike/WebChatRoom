@@ -1,9 +1,11 @@
 const socket = io(`http://${DOMAIN}:${PORT}`);
 /**Socket**/
-socket.on('connect', function ()
+socket.on('connect', async function ()
 {
-	socket.emit('join', {account: sessionStorage.getItem('account')});
-	sessionStorage.clear();
+	await socket.emit('join', {account: sessionStorage.getItem('account')});
+	await sessionStorage.clear();
+	get_info();
+	get_list();
 });
 
 socket.on('change_status', function (data)
@@ -47,7 +49,7 @@ socket.on('disconnect', function ()
 });
 
 /**Get user's info**/
-$(function ()
+function get_info()
 {
 	const $body = $('body');
 	const $nickname = $('#nickname');
@@ -123,13 +125,7 @@ $(function ()
 		});
 
 	$body.css('transition', '5s background-image');
-});
-
-/**Get list**/
-$(function ()
-{
-	get_list();
-});
+}
 
 /**Add tips**/
 $(function ()
