@@ -38,7 +38,9 @@ $(function ()
 						}
 					}
 					if (existent === false)
-						report(`账户${account}头像丢失`);
+					{
+						socket.emit('set_default_avatar');
+					}
 				}
 				if (customize_background === true)
 				{
@@ -52,7 +54,10 @@ $(function ()
 						}
 					}
 					if (existent === false)
-						report(`账户${account}背景丢失`);
+					{
+						socket.emit('set_default_background');
+						$body.css('backgroundImage', `url('images/backgrounds/background.jpg')`);
+					}
 				}
 				else
 					$body.css('backgroundImage', `url('images/backgrounds/background.jpg')`);
@@ -79,33 +84,6 @@ $(function ()
 {
 	get_list();
 });
-
-/**
- * data:
- * [
- *      {account,nickname,age,gender,status,customize_avatar}
- * ]
- * **/
-function get_list()
-{
-	AJAX('get_list', {},
-		function (response)
-		{
-			const {code, message, data} = response;
-			if (code === false)
-				show_error_modal();
-			else
-			{
-				for (const info_obj of data)
-					list_add_row(info_obj);
-			}
-		},
-		function (error)
-		{
-			console.log(error);
-			show_error_modal();
-		});
-}
 
 /**Add tips**/
 $(function ()
@@ -220,34 +198,29 @@ $(function ()
 	const $status = $('.status');
 	$status.click(function (event)
 	{
-		let status = $(event.target).attr('id');
-		switch_status_to(status);
+		let status = parseInt($(event.target).attr('id'));
+		if (status === OFFLINE)
+			location.href = 'index.html';
+		else
+			switch_status_to(status);
 	})
 });
 
-function switch_status_to(status, async = true)
+function switch_status_to(status)
 {
 	const $status_icon = $('#status-icon');
-	AJAX('switch_status', {status: status},
-		function (response)
+	socket.emit('switch_status', {status: status});
+	socket.on('switch_status_response', function (response)
+	{
+		const {code, message} = response;
+		if (code === false)
+			show_tip(message, 'error');
+		else
 		{
-			const {code, message, data} = response;
-			if (parseInt(status) === 0)
-				location.href = 'index.html';
-
-			if (code === false)
-				show_error_modal();
-			else
-			{
-				$status_icon.removeAttr('class');
-				$status_icon.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
-			}
-		},
-		function (error)
-		{
-			console.log(error.stack);
-			show_tip('状态切换失败', 'error');
-		}, async);
+			$status_icon.removeAttr('class');
+			$status_icon.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
+		}
+	})
 }
 
 /**Upload avatar preview**/
@@ -295,7 +268,10 @@ $(function ()
 						}
 					}
 					if (existent === false)
-						report(`账户${account}背景丢失`);
+					{
+						socket.emit('set_default_background');
+						$body.css('backgroundImage', `url('images/backgrounds/${account}.${file_type}?${Date.now()}')`);
+					}
 				}
 			},
 			function (error)
@@ -348,7 +324,11 @@ $(function ()
 							}
 						}
 						if (existent === false)
-							report(`账户${account}头像丢失`);
+						{
+							socket.emit('set_default_avatar');
+							$avatar.attr('src', `images/avatars/${account}.${file_type}?${Date.now()}`);
+							$current_avatar.attr('src', `images/avatars/${account}.${file_type}?${Date.now()}`);
+						}
 					}
 				},
 				function (error)
@@ -417,6 +397,12 @@ $(function ()
 });
 
 /**Socket**/
+socket.on('connect', function ()
+{
+	socket.emit('join', {account: sessionStorage.getItem('account')});
+	sessionStorage.clear();
+});
+
 socket.on('change_status', function (data)
 {
 	change_status(data);
@@ -442,12 +428,17 @@ socket.on('receive_message', function (data)
 	dialog_add_row(data);
 });
 
-socket.on('is_online', function (data)
+socket.on('enable_input', function ()
 {
-	socket.emit('online', {});
+	$('#dialog-textarea').removeAttr('disabled');
 });
 
-socket.on('disconnect',function ()
+socket.on('disable_input', function ()
+{
+	$('#dialog-textarea').attr('disabled', 'disabled');
+});
+
+socket.on('disconnect', function ()
 {
 	show_error_modal();
 });
@@ -487,6 +478,33 @@ function show_error_modal()
 {
 	const $offline_modal = $('#offline-modal');
 	$offline_modal.modal('show');
+}
+
+/**
+ * data:
+ * [
+ *      {account,nickname,age,gender,status,customize_avatar}
+ * ]
+ * **/
+function get_list()
+{
+	AJAX('get_list', {},
+		function (response)
+		{
+			const {code, message, data} = response;
+			if (code === false)
+				show_error_modal();
+			else
+			{
+				for (const info_obj of data)
+					list_add_row(info_obj);
+			}
+		},
+		function (error)
+		{
+			console.log(error);
+			show_error_modal();
+		});
 }
 
 /**
@@ -552,8 +570,7 @@ function list_change_avatar(info_obj)
 		}
 	if (file_type === '')
 	{
-		report(`账号${account}头像丢失`);
-		return;
+		socket.emit('set_default_avatar');
 	}
 	$(`#${account}_avatar`).attr('src', `images/avatars/${account}.${file_type}?${Date.now()}`);
 }
@@ -634,15 +651,3 @@ function dialog_add_row(message_obj)
 	$dialog_area.animate({scrollTop: $message_table.height()}, 500);
 }
 
-
-/**Online/Offline switch**/
-window.onunload = function ()
-{
-	switch_status_to(OFFLINE, false);
-	socket.close();
-};
-
-$(function ()
-{
-	switch_status_to(ONLINE);
-});

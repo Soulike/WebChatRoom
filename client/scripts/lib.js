@@ -8,8 +8,8 @@ const STATUS_ICONS = {
 	WATCHING: 'glyphicon-eye-open',
 	LEAVE: 'glyphicon-glass',
 };
-//const [DOMAIN, PORT] = ['127.0.0.1', 8080];
-const [DOMAIN, PORT] = ['47.94.152.219', 8080];
+const [DOMAIN, PORT] = ['127.0.0.1', 8080];
+//const [DOMAIN, PORT] = ['47.94.152.219', 8080];
 
 const MESSAGE_MAX_LENGTH = 50;
 
@@ -178,21 +178,6 @@ function is_existent(file_relative_path)
 			},
 		});
 	return status;
-}
-
-function report(content)
-{
-	AJAX('report', {content: content},
-		function (response)
-		{
-			console.log(content);
-			console.log(response);
-		},
-		function (error)
-		{
-			console.log(content);
-			console.log(error);
-		});
 }
 
 function preview_image($img_selector, $input_selector)

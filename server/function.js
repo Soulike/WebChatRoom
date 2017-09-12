@@ -1,4 +1,3 @@
-const md5 = require('blueimp-md5');
 const fs = require('fs');
 const CONFIG = require('./config');
 
@@ -128,33 +127,6 @@ exports.update_query = function (pool, new_info_obj, filters_obj, logic = 'AND')
 	return pool.query(select_query_string);
 };
 
-exports.set_identify_cookie = function (ctx, account, password)
-{
-	const date = new Date();
-	ctx.cookies.set(md5(account), md5(account + password + date.toDateString()),
-	{
-		SameSite:'Strict',
-	})
-};
-
-exports.validate_cookie = async function (ctx, pool)
-{
-	const account = ctx.cookies.get('account');
-	if (account === undefined)
-		return false;
-	if (!CONFIG.REG.ACCOUNT.test(account))
-		return false;
-	const value = ctx.cookies.get(md5(account));
-	if (!value)
-		return false;
-	const res = await exports.select_query(pool, ['password'], {account: account});
-	if (res.rowCount === 0)
-		return false;
-	const {password} = res.rows[0];
-	const date = new Date();
-	return (value === md5(account + password + date.toDateString()));
-};
-
 exports.delete_file = function (path)
 {
 	try
@@ -170,11 +142,6 @@ exports.clear_files = function (account, type)
 {
 	for (const file_type of CONFIG.ALLOW_TYPES)
 		exports.delete_file(`client/images/${type}s/${account}.${file_type}`);
-};
-
-exports.socket_send = function (io, event, data)
-{
-	io.broadcast(`${event}`, data);
 };
 
 exports.COOKIE = {};
@@ -196,7 +163,7 @@ exports.COOKIE.parse = function (cookie_string)
 
 exports.set_status = async function (redis_client, account, status, pool, io)
 {
-	if (account === undefined)
+	if (!account || isNaN(parseInt(account)))
 		return;
 	if (parseInt(status) === CONFIG.STATUS.OFFLINE)
 	{
@@ -205,7 +172,7 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 	}
 	else
 	{
-		await redis_client.hmsetAsync(account, {status: parseInt(status), last_respond: Date.now()});
+		await redis_client.hmsetAsync(account, {status: parseInt(status)});
 	}
 
 	let data = {};
@@ -221,7 +188,7 @@ exports.set_status = async function (redis_client, account, status, pool, io)
 		data.account = account;
 		data.status = CONFIG.STATUS.OFFLINE;
 	}
-	await exports.socket_send(io, 'change_status', data);
+	await io.sockets.emit('change_status',data);
 };
 
 exports.OBJECT = {};
@@ -235,17 +202,4 @@ exports.OBJECT.find_status = async function (redis_client, status)
 			ret.push(key);
 	}
 	return ret;
-};
-
-exports.check_online = async function (redis_client, io, pool)
-{
-	const now = Date.now();
-	const keys = (await redis_client.scanAsync(0))[1];
-	for (const account of keys)
-	{
-		if (now - (parseInt(await redis_client.hmgetAsync(account, 'last_respond'))) > CONFIG.STATUS.MAX_OFFLINE_WAITING_SECONDS * 1000)
-		{
-			await exports.set_status(redis_client, account, CONFIG.STATUS.OFFLINE, pool, io);
-		}
-	}
 };

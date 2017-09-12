@@ -4,12 +4,8 @@ const FUNCTION = require('./server/function');
 const Koa = require('koa');
 const app = new Koa();
 
-const Io = require('koa-socket');
-const io = new Io();
-io.attach(app);
-
 const redis = require("redis");
-const client = redis.createClient();
+const redis_client = redis.createClient();
 
 const Promise = require("bluebird");
 Promise.promisifyAll(redis.RedisClient.prototype);
@@ -26,49 +22,25 @@ const body = require('koa-body');
 
 const route = require('koa-route');
 
+const server = require('http').Server(app.callback());
+const io = require('socket.io')(server);
+
+let user_socket_map = new Map();//find account through socket id
+
 app.use(koa_static('client/'));
 app.use(koa_helmet());
 app.use(body({multipart: true}));
-
-setInterval(async function ()
-{
-	FUNCTION.socket_send(io, 'is_online', {});
-	await FUNCTION.check_online(client, io, pool);
-}, CONFIG.STATUS.CHECK_ONLINE_SECONDS * 1000);
-
 FUNCTION.log(`主进程 ${process.pid} 启动`);
 
-client.on('connect', async function ()
+redis_client.on('connect', async function ()
 {
-	await client.flushallAsync();
+	await redis_client.flushallAsync();
 	FUNCTION.log('Redis 初始化完成');
 });
 
-client.on('error', function (error)
+redis_client.on('error', function (error)
 {
 	FUNCTION.log(`Redis 错误，错误信息：\n${error.stack}`);
-});
-
-/**Socket**/
-io.on('send_message', async function (ctx, data)
-{
-	const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
-	const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
-	const {nickname} = res.rows[0];
-
-	const {font, bold, font_size, content} = ctx.data;
-
-	const date = new Date();
-	const send_time = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}时${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}分`;
-
-	const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
-	FUNCTION.socket_send(io, 'receive_message', message);
-});
-
-io.on('online', async function (ctx, data)
-{
-	const {account} = FUNCTION.COOKIE.parse(ctx.socket.socket.handshake.headers.cookie);
-	await client.hmsetAsync(account, {last_respond: Date.now()});
 });
 
 app.use(route.post('/register', async function (ctx, next)
@@ -132,7 +104,7 @@ app.use(route.post('/login', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false, '账号不存在');
 				FUNCTION.log(`账号${account}登陆失败：账号不存在`);
 			}
-			else if (((await client.scanAsync(0))[1]).indexOf(account) !== -1)
+			else if (((await redis_client.scanAsync(0))[1]).indexOf(account) !== -1)
 			{
 				ctx.body = new CONFIG.RESPONSE(false, '账号已登录');
 				FUNCTION.log(`账号${account}登陆失败：账号已登录`);
@@ -143,11 +115,6 @@ app.use(route.post('/login', async function (ctx, next)
 				if (password === right_password)
 				{
 					ctx.body = new CONFIG.RESPONSE(true, '登陆成功');
-					await ctx.cookies.set('account', account, {
-						SameSite: 'Strict',
-					});
-					await FUNCTION.set_identify_cookie(ctx, account, password);
-					await FUNCTION.set_status(client, account, CONFIG.STATUS.ONLINE, pool, io);
 					FUNCTION.log(`账号${account}登陆成功`);
 				}
 				else
@@ -167,10 +134,10 @@ app.use(route.post('/login', async function (ctx, next)
 
 app.use(route.post('/get_user_info', async function (ctx, next)
 {
-	const account = parseInt(ctx.cookies.get('account'));
+	const account = parseInt(user_socket_map.get(ctx.cookies.get('io')));
 	try
 	{
-		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
+		if (!account || isNaN(account))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -179,7 +146,7 @@ app.use(route.post('/get_user_info', async function (ctx, next)
 				ctx.body = new CONFIG.RESPONSE(false);
 			else
 			{
-				await client.hmsetAsync(account, {status: CONFIG.STATUS.ONLINE, last_respond: Date.now()});
+				await redis_client.hmsetAsync(account, {status: CONFIG.STATUS.ONLINE});
 				const data = res.rows[0];
 				ctx.body = new CONFIG.RESPONSE(true, '', data);
 			}
@@ -192,42 +159,16 @@ app.use(route.post('/get_user_info', async function (ctx, next)
 	await next();
 }));
 
-app.use(route.post('/switch_status', async function (ctx, next)
-{
-	const account = ctx.cookies.get('account');
-	const {status} = ctx.request.body;
-	try
-	{
-		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
-			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
-		else
-		{
-			if (status === undefined)
-				ctx.body = new CONFIG.RESPONSE(false, '参数错误');
-			else
-			{
-				await FUNCTION.set_status(client, account, status, pool, io);
-				ctx.body = new CONFIG.RESPONSE(true);
-			}
-		}
-	} catch (error)
-	{
-		ctx.body = new CONFIG.RESPONSE(false);
-		FUNCTION.log(`账号${account}更改状态失败。错误信息：\n${error.stack}`);
-	}
-	await next();
-}));
-
 app.use(route.post('/background_upload', async function (ctx, next)
 {
 	const background_path = 'client/images/backgrounds';
-	const account = ctx.cookies.get('account');
+	const account = parseInt(user_socket_map.get(ctx.cookies.get('io')));
 	const file = ctx.request.body.files.file;
 	const file_type = `${file.type.slice(6)}`;
 	const file_path = `${background_path}/${account}.${file_type}`;
 	try
 	{
-		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
+		if (!account || isNaN(parseInt(account)))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -249,13 +190,13 @@ app.use(route.post('/background_upload', async function (ctx, next)
 app.use(route.post('/avatar_upload', async function (ctx, next)
 {
 	const avatar_path = 'client/images/avatars';
-	const account = ctx.cookies.get('account');
+	const account = parseInt(user_socket_map.get(ctx.cookies.get('io')));
 	const file = ctx.request.body.files.file;
 	const file_type = `${file.type.slice(6)}`;
 	const file_path = `${avatar_path}/${account}.${file_type}`;
 	try
 	{
-		if (account === undefined || !FUNCTION.validate_cookie(ctx, pool))
+		if (!account || isNaN(parseInt(account)))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -265,7 +206,7 @@ app.use(route.post('/avatar_upload', async function (ctx, next)
 			await reader.pipe(writer);
 			FUNCTION.update_query(pool, {customize_avatar: true}, {account: account});
 			ctx.body = new CONFIG.RESPONSE(true, '头像更改成功', {account: account});
-			FUNCTION.socket_send(io, 'change_avatar', {account: account});
+			io.sockets.emit('change_avatar', {account: account});
 		}
 	} catch (error)
 	{
@@ -278,10 +219,10 @@ app.use(route.post('/avatar_upload', async function (ctx, next)
 app.use(route.post('/modify_info', async function (ctx, next)
 {
 	const {nickname, age, gender} = ctx.request.body;
-	const account = ctx.cookies.get('account');
+	const account = parseInt(user_socket_map.get(ctx.cookies.get('io')));
 	try
 	{
-		if (!FUNCTION.validate_cookie(ctx, pool))
+		if (!account || isNaN(parseInt(account)))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
@@ -299,7 +240,7 @@ app.use(route.post('/modify_info', async function (ctx, next)
 					gender: gender
 				}, {account: account});
 				ctx.body = new CONFIG.RESPONSE(true, '信息更改成功', {account: account});
-				FUNCTION.socket_send(io, 'modify_info', {
+				io.sockets.emit('modify_info', {
 					account: account,
 					nickname: nickname,
 					age: age,
@@ -315,13 +256,6 @@ app.use(route.post('/modify_info', async function (ctx, next)
 	await next();
 }));
 
-app.use(route.post('/report', async function (ctx, next)
-{
-	FUNCTION.log(ctx.request.body.content);
-	ctx.body = 'Report received.';
-	await next();
-}));
-
 /**
  * data:
  * [
@@ -330,14 +264,15 @@ app.use(route.post('/report', async function (ctx, next)
  * **/
 app.use(route.post('/get_list', async function (ctx, next)
 {
+	const account = parseInt(user_socket_map.get(ctx.cookies.get('io')));
 	try
 	{
-		if (!FUNCTION.validate_cookie(ctx, pool))
+		if (!account || isNaN(parseInt(account)))
 			ctx.body = new CONFIG.RESPONSE(false, '登录状态异常');
 		else
 		{
-			const online = await FUNCTION.OBJECT.find_status(client, CONFIG.STATUS.ONLINE);
-			const leave = await FUNCTION.OBJECT.find_status(client, CONFIG.STATUS.LEAVE);
+			const online = await FUNCTION.OBJECT.find_status(redis_client, CONFIG.STATUS.ONLINE);
+			const leave = await FUNCTION.OBJECT.find_status(redis_client, CONFIG.STATUS.LEAVE);
 			const data = [];
 			for (const account of online)
 			{
@@ -363,4 +298,65 @@ app.use(route.post('/get_list', async function (ctx, next)
 	await next();
 }));
 
-app.listen(CONFIG.PORT);
+/**Socket**/
+
+io.on('connect', function (socket)
+{
+	socket.on('join', async function (data)
+	{
+		user_socket_map.set(socket.id, data.account);
+		await FUNCTION.set_status(redis_client, data.account, CONFIG.STATUS.ONLINE, pool, io);
+	});
+
+	socket.on('send_message', async function (data)
+	{
+		const account = user_socket_map.get(socket.id);
+		const res = await FUNCTION.select_query(pool, ['nickname'], {account: account});
+		const {nickname} = res.rows[0];
+
+		const {font, bold, font_size, content} = data;
+
+		const date = new Date();
+		const send_time = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}时${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}分`;
+
+		const message = new CONFIG.MESSAGE(account, nickname, font, bold, font_size, content, send_time);
+		io.sockets.emit('receive_message', message);
+	});
+
+	socket.on('switch_status', async function (data)
+	{
+		const {status} = data;
+		if (status === undefined)
+			socket.emit('switch_status_response', {code: false, message: '参数错误'});
+		else
+		{
+			await FUNCTION.set_status(redis_client, user_socket_map.get(socket.id), status, pool, io);
+
+			if (status === CONFIG.STATUS.WATCHING)
+				socket.emit('disable_input');
+			else
+				socket.emit('enable_input');
+			socket.emit('switch_status_response', {code: true, message: ''});
+		}
+	});
+
+	socket.on('set_default_avatar', async function ()
+	{
+		const account = user_socket_map.get(socket.id);
+		await FUNCTION.update_query(pool, {customize_avatar: false}, {account: account});
+	});
+
+	socket.on('set_default_background', async function ()
+	{
+		const account = user_socket_map.get(socket.id);
+		await FUNCTION.update_query(pool, {customize_background: false}, {account: account});
+	});
+
+	socket.on('disconnect', async function ()
+	{
+		const account = user_socket_map.get(socket.id);
+		await FUNCTION.set_status(redis_client, account, CONFIG.STATUS.OFFLINE, pool, io);
+	});
+});
+
+server.listen(CONFIG.PORT);

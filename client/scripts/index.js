@@ -36,6 +36,7 @@ $(function ()
 						show_tip(message);
 						setTimeout(function ()
 						{
+							sessionStorage.setItem('account',account);
 							location.href = 'room.html';
 						}, 2000);
 					}
