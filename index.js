@@ -355,6 +355,7 @@ io.on('connect', function (socket)
 	socket.on('disconnect', async function ()
 	{
 		const account = user_socket_map.get(socket.id);
+		user_socket_map.delete(account);
 		await FUNCTION.set_status(redis_client, account, CONFIG.STATUS.OFFLINE, pool, io);
 	});
 });
