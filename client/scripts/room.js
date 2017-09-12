@@ -1,5 +1,5 @@
-const socket = io(`http://${DOMAIN}:${PORT}`);
 /**Socket**/
+const socket = io(`http://${DOMAIN}:${PORT}`);
 socket.on('connect', function ()
 {
 	socket.emit('join', {account: sessionStorage.getItem('account')});
@@ -47,85 +47,6 @@ socket.on('disconnect', function ()
 {
 	show_error_modal();
 });
-
-/**Get user's info**/
-function get_info()
-{
-	const $body = $('body');
-	const $nickname = $('#nickname');
-	const $avatar = $('#avatar');
-	const $current_avatar = $('#current-avatar');
-	const $new_nickname = $('#new-nickname');
-	const $new_age = $('#new-age');
-	const $new_gender = $('#new-gender');
-
-	AJAX('get_user_info', {},
-		function (response)
-		{
-			const {code, message, data} = response;
-			if (code === false)
-				show_error_modal();
-			else
-			{
-				const {account, nickname, age, gender, customize_avatar, customize_background} = data;
-				sessionStorage.setItem('account', account);
-				$nickname.text(nickname);
-				$new_nickname.val(nickname);
-				$new_age.val(age);
-				$new_gender.val(gender === true ? 'male' : 'female');
-				if (customize_avatar === true)
-				{
-					let existent = false;
-					for (const file_type of ALLOW_FILE_TYPES)
-					{
-						if (is_existent(`images/avatars/${account}.${file_type}`))
-						{
-							existent = true;
-							$avatar.attr('src', `images/avatars/${account}.${file_type}`);
-							$current_avatar.attr('src', `images/avatars/${account}.${file_type}`);
-						}
-					}
-					if (existent === false)
-					{
-						socket.emit('set_default_avatar');
-					}
-				}
-				if (customize_background === true)
-				{
-					let existent = false;
-					for (const file_type of ALLOW_FILE_TYPES)
-					{
-						if (is_existent(`images/backgrounds/${account}.${file_type}`))
-						{
-							existent = true;
-							$body.css('backgroundImage', `url('images/backgrounds/${account}.${file_type}')`);
-						}
-					}
-					if (existent === false)
-					{
-						socket.emit('set_default_background');
-						$body.css('backgroundImage', `url('images/backgrounds/background.jpg')`);
-					}
-				}
-				else
-					$body.css('backgroundImage', `url('images/backgrounds/background.jpg')`);
-
-				popover_by_id(['avatar'],
-					`<span class="glyphicon glyphicon-user"></span> 账号：${account}<br/>
-<span class="glyphicon glyphicon-heart"></span> 昵称：${nickname}<br/>
-<span class="glyphicon glyphicon-globe"></span> 年龄：${age}<br/>
-<span class="glyphicon glyphicon-leaf"></span> 性别：${gender ? '男' : '女'}`,
-					`<span class="glyphicon glyphicon-info-sign"></span>  用户信息`, 'right', true);
-			}
-		},
-		function (error)
-		{
-			console.log(error.stack);
-			show_error_modal();
-		});
-
-	$body.css('transition', '5s background-image');
-}
 
 /**Add tips**/
 $(function ()
@@ -247,23 +168,6 @@ $(function ()
 			switch_status_to(status);
 	})
 });
-
-function switch_status_to(status)
-{
-	const $status_icon = $('#status-icon');
-	socket.emit('switch_status', {status: status});
-	socket.on('switch_status_response', function (response)
-	{
-		const {code, message} = response;
-		if (code === false)
-			show_tip(message, 'error');
-		else
-		{
-			$status_icon.removeAttr('class');
-			$status_icon.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
-		}
-	})
-}
 
 /**Upload avatar preview**/
 $(function ()
@@ -475,6 +379,85 @@ function show_error_modal()
 	$offline_modal.modal('show');
 }
 
+/**Get user's info**/
+function get_info()
+{
+	const $body = $('body');
+	const $nickname = $('#nickname');
+	const $avatar = $('#avatar');
+	const $current_avatar = $('#current-avatar');
+	const $new_nickname = $('#new-nickname');
+	const $new_age = $('#new-age');
+	const $new_gender = $('#new-gender');
+
+	AJAX('get_user_info', {},
+		function (response)
+		{
+			const {code, message, data} = response;
+			if (code === false)
+				show_error_modal();
+			else
+			{
+				const {account, nickname, age, gender, customize_avatar, customize_background} = data;
+				sessionStorage.setItem('account', account);
+				$nickname.text(nickname);
+				$new_nickname.val(nickname);
+				$new_age.val(age);
+				$new_gender.val(gender === true ? 'male' : 'female');
+				if (customize_avatar === true)
+				{
+					let existent = false;
+					for (const file_type of ALLOW_FILE_TYPES)
+					{
+						if (is_existent(`images/avatars/${account}.${file_type}`))
+						{
+							existent = true;
+							$avatar.attr('src', `images/avatars/${account}.${file_type}`);
+							$current_avatar.attr('src', `images/avatars/${account}.${file_type}`);
+						}
+					}
+					if (existent === false)
+					{
+						socket.emit('set_default_avatar');
+					}
+				}
+				if (customize_background === true)
+				{
+					let existent = false;
+					for (const file_type of ALLOW_FILE_TYPES)
+					{
+						if (is_existent(`images/backgrounds/${account}.${file_type}`))
+						{
+							existent = true;
+							$body.css('backgroundImage', `url('images/backgrounds/${account}.${file_type}')`);
+						}
+					}
+					if (existent === false)
+					{
+						socket.emit('set_default_background');
+						$body.css('backgroundImage', `url('images/backgrounds/background.jpg')`);
+					}
+				}
+				else
+					$body.css('backgroundImage', `url('images/backgrounds/background.jpg')`);
+
+				popover_by_id(['avatar'],
+					`<span class="glyphicon glyphicon-user"></span> 账号：${account}<br/>
+<span class="glyphicon glyphicon-heart"></span> 昵称：${nickname}<br/>
+<span class="glyphicon glyphicon-globe"></span> 年龄：${age}<br/>
+<span class="glyphicon glyphicon-leaf"></span> 性别：${gender ? '男' : '女'}`,
+					`<span class="glyphicon glyphicon-info-sign"></span>  用户信息`, 'right', true);
+			}
+		},
+		function (error)
+		{
+			console.log(error.stack);
+			show_error_modal();
+		});
+
+	$body.css('transition', '5s background-image');
+}
+
 /**
  * data:
  * [
@@ -500,6 +483,23 @@ function get_list()
 			console.log(error);
 			show_error_modal();
 		});
+}
+
+function switch_status_to(status)
+{
+	const $status_icon = $('#status-icon');
+	socket.emit('switch_status', {status: status});
+	socket.on('switch_status_response', function (response)
+	{
+		const {code, message} = response;
+		if (code === false)
+			show_tip(message, 'error');
+		else
+		{
+			$status_icon.removeAttr('class');
+			$status_icon.addClass('glyphicon').addClass((Object.values(STATUS_ICONS))[status]);
+		}
+	})
 }
 
 /**
@@ -645,4 +645,3 @@ function dialog_add_row(message_obj)
 	);
 	$dialog_area.animate({scrollTop: $message_table.height()}, 500);
 }
-
