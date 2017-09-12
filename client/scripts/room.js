@@ -1,4 +1,50 @@
 const socket = io(`http://${DOMAIN}:${PORT}`);
+/**Socket**/
+socket.on('connect', function ()
+{
+	socket.emit('join', {account: sessionStorage.getItem('account')});
+	sessionStorage.clear();
+});
+
+socket.on('change_status', function (data)
+{
+	change_status(data);
+});
+
+socket.on('current_list', function (data)
+{
+	list_add_row(data);
+});
+
+socket.on('modify_info', function (data)
+{
+	list_modify_info(data);
+});
+
+socket.on('change_avatar', function (data)
+{
+	list_change_avatar(data);
+});
+
+socket.on('receive_message', function (data)
+{
+	dialog_add_row(data);
+});
+
+socket.on('enable_input', function ()
+{
+	$('#dialog-textarea').removeAttr('disabled');
+});
+
+socket.on('disable_input', function ()
+{
+	$('#dialog-textarea').attr('disabled', 'disabled');
+});
+
+socket.on('disconnect', function ()
+{
+	show_error_modal();
+});
 
 /**Get user's info**/
 $(function ()
@@ -394,53 +440,6 @@ $(function ()
 			}
 		}
 	});
-});
-
-/**Socket**/
-socket.on('connect', function ()
-{
-	socket.emit('join', {account: sessionStorage.getItem('account')});
-	sessionStorage.clear();
-});
-
-socket.on('change_status', function (data)
-{
-	change_status(data);
-});
-
-socket.on('current_list', function (data)
-{
-	list_add_row(data);
-});
-
-socket.on('modify_info', function (data)
-{
-	list_modify_info(data);
-});
-
-socket.on('change_avatar', function (data)
-{
-	list_change_avatar(data);
-});
-
-socket.on('receive_message', function (data)
-{
-	dialog_add_row(data);
-});
-
-socket.on('enable_input', function ()
-{
-	$('#dialog-textarea').removeAttr('disabled');
-});
-
-socket.on('disable_input', function ()
-{
-	$('#dialog-textarea').attr('disabled', 'disabled');
-});
-
-socket.on('disconnect', function ()
-{
-	show_error_modal();
 });
 
 /**Send Message**/
