@@ -9,7 +9,7 @@ const STATUS_ICONS = {
 	LEAVE: 'glyphicon-glass',
 };
 //const [DOMAIN, PORT] = ['127.0.0.1', 8080];
-const [DOMAIN, PORT] = ['47.94.152.219', 8080];
+const [DOMAIN, PORT] = ['47.94.152.219', 80];
 
 const MESSAGE_MAX_LENGTH = 50;
 
