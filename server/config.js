@@ -1,6 +1,6 @@
 exports.PORT = 8080;
-//exports.DOMAIN = '47.94.152.219';
-exports.DOMAIN = '127.0.0.1';
+exports.DOMAIN = '47.94.152.219';
+//exports.DOMAIN = '127.0.0.1';
 
 exports.DATABASE_CONFIG = {
 	user: 'postgres',
