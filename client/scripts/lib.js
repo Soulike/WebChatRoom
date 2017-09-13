@@ -14,10 +14,10 @@ const [DOMAIN, PORT] = ['47.94.152.219', 8080];
 const MESSAGE_MAX_LENGTH = 50;
 
 const FONTS = {
-	song: "'宋体','simsun','AR PL UMing CN',serif",
-	msyh: "'微软雅黑','Microsoft Yahei','simhei',sans-serif",
-	kai: "'楷体','simkai','AR PL UKai CN',sans-serif",
-	fangSong: "'仿宋','simfang',sans-serif",
+	song: "宋体,simsun,'AR PL UMing CN',serif",
+	msyh: "微软雅黑,'Microsoft Yahei',simhei,sans-serif",
+	kai: "楷体,simkai,'AR PL UKai CN',sans-serif",
+	fangSong: "仿宋,simfang,sans-serif",
 };
 
 class Register_info
