@@ -639,7 +639,7 @@ function dialog_add_row(message_obj)
  </div>
  <div class="table-cell-display message-nickname middle">${nickname}</div>
  <span class="table-cell-display middle colon">:</span>
- <div class="table-cell-display message middle" style=${style}>${content}</div>
+ <div class="table-cell-display message middle" style="${style}">${content}</div>
  <div class="table-cell-display message-time middle">${send_time}</div>
  </div>`
 	);
