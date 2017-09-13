@@ -64,7 +64,7 @@ $(function ()
 	const $font_style = $('.font-style');
 	for (const link of $font_style)
 	{
-		$(link).css('fontFamily', `${$(link).text()},serif`);
+		$(link).css('fontFamily', FONTS[$(link).attr('id')]);
 	}
 });
 
@@ -88,8 +88,8 @@ $(function ()
 	$font_style.click((e) =>
 	{
 		e.preventDefault();
-		const font_style = e.target.text;
-		$dialog_textarea.css('fontFamily', `${font_style},serif`);
+		const font_style = $(e.target).attr('id');
+		$dialog_textarea.css('fontFamily', FONTS[font_style]);
 	});
 
 	$font_size.click((e) =>
