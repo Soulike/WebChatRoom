@@ -621,7 +621,7 @@ function dialog_add_row(message_obj)
 	const $message_table = $('#message-table');
 	const $dialog_area = $('#dialog-area');
 	const {account, nickname, font, bold, font_size, content, send_time} = message_obj;
-	const style = `font-family:${font};font-weight:${bold};font-size:${font_size}`;
+	const style = `font-family:"${font}";font-weight:${bold};font-size:${font_size}`;
 	let file_type = '';
 	let has_avatar = false;
 	for (const file_t of ALLOW_FILE_TYPES)
